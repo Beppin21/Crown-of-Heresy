@@ -1,7 +1,5 @@
 using UnityEngine;
 
-// Cualquier objeto con el que el jugador pueda interactuar (levantar, abrir, activar)
-// concreta (cofre, puerta, palanca...)-.
 public interface IInteractable
 {
     void Interact(GameObject interactor);
@@ -10,12 +8,14 @@ public interface IInteractable
 public class PlayerInteraction : MonoBehaviour
 {
     [Header("Raycast de interacción")]
-    [SerializeField] private Transform cameraTransform; 
+    [SerializeField] private Transform cameraTransform;
     [SerializeField] private float interactRange = 3f;
     [SerializeField] private LayerMask interactableLayer;
 
     public void TryInteract()
     {
+        if (cameraTransform == null) return;
+
         bool hitSomething = Physics.Raycast(
             cameraTransform.position,
             cameraTransform.forward,
@@ -23,14 +23,31 @@ public class PlayerInteraction : MonoBehaviour
             interactRange,
             interactableLayer);
 
-        if (!hitSomething) return;
+        if (hitSomething)
+        {
+            // Rayo verde visible en Scene y Game por 2 segundos si impactó algo válido
+            Debug.DrawRay(cameraTransform.position, cameraTransform.forward * hit.distance, Color.green, 2f);
 
-        IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-        if (interactable != null)
-            interactable.Interact(gameObject);
+            // Busca la interfaz en el collider tocado o en cualquiera de sus padres
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable != null)
+            {
+                interactable.Interact(gameObject);
+            }
+            else
+            {
+                Debug.Log($"Chocó contra {hit.collider.name}, pero no tiene IInteractable ni en él ni en su padre.");
+            }
+        }
+        else
+        {
+            // Rayo rojo visible por 1 segundo si el raycast no alcanzó nada
+            Debug.DrawRay(cameraTransform.position, cameraTransform.forward * interactRange, Color.red, 1f);
+        }
     }
 
-    private void OnDrawGizmosSelected()
+    // OnDrawGizmos se dibuja SIEMPRE en la Scene view (no exige tener al Player seleccionado)
+    private void OnDrawGizmos()
     {
         if (cameraTransform == null) return;
         Gizmos.color = Color.yellow;
