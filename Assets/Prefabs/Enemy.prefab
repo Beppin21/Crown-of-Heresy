@@ -434,6 +434,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 763a293c23290fd4d95b4f167f10579d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDasher
+  maxHealth: 50
+  lootPrefab: {fileID: 2648580526016975762, guid: c4c203bb64e30154b8b7b96ab15616fa, type: 3}
   detectionRange: 10
   shakeDuration: 0.8
   shakeIntensity: 0.15
