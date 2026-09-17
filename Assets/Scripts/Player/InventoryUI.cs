@@ -26,15 +26,8 @@ public class InventoryUI : MonoBehaviour
         UpdateUI();
     }
 
-    private void Update()
-    {
-        // Detecta la tecla TAB con el New Input System
-        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
-        {
-            ToggleInventory();
-        }
-    }
-
+    // El toggle lo dispara PlayerController.OnInventary (acción "inventary" del Input System,
+    // bindeada a Tab), no una lectura directa acá, para no togglear dos veces por el mismo Tab.
     public void ToggleInventory()
     {
         isOpen = !isOpen;

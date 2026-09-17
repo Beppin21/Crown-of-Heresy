@@ -11,16 +11,20 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
     [Header("Referencias")]
-    [SerializeField] private Transform cameraTransform; 
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private InventoryUI inventoryUI;
 
-    private Rigidbody rb;        
-    private Animator animator;   
-    private PlayerStats stats;   
+    private Rigidbody rb;
+    private Animator animator;
+    private PlayerStats stats;
     private PlayerCombat combat;     private PlayerInteraction interaction;
     [Header("Movimiento")]
     [SerializeField] private float walkSpeed = 2.5f;
     [SerializeField] private float runSpeed = 5.5f;
     [SerializeField] private float rotationSpeed = 10f;
+
+    [Header("Salto")]
+    [SerializeField] private float jumpForce = 5f;
 
     [Header("Rodada (Roll / Dodge)")]
     [SerializeField] private float rollDuration = 0.6f;
@@ -299,6 +303,18 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         else if (context.canceled) isRunning = false;
     }
 
+    // Se llama al presionar la tecla de saltar. Solo salta si está parado en el piso y libre
+    // (no rodando, atacando ni muerto).
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+        if (!IsGrounded) return;
+        if (currentState == PlayerState.Rolling || currentState == PlayerState.Attacking || currentState == PlayerState.Dead) return;
+
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+        animator.SetTrigger("Jump");
+    }
+
     // Se llama al presionar la tecla de rodar/esquivar.
     public void OnRoll(InputAction.CallbackContext context)
     {
@@ -372,6 +388,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (currentState == PlayerState.Dead) return;
 
         interaction.TryInteract();
+    }
+
+    // Se llama al presionar la tecla de inventario (Tab). Delega el toggle a InventoryUI,
+    // asignado por Inspector.
+    public void OnInventary(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+        if (currentState == PlayerState.Dead) return;
+
+        inventoryUI?.ToggleInventory();
     }
 
     // ---------------------------------------------------------------

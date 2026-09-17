@@ -25,7 +25,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Roll",
+                    "name": "jump",
                     "type": "Button",
                     "id": "544ace2e-a9d2-4d08-bc91-371f77a2f7fe",
                     "expectedControlType": "",
@@ -95,6 +95,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "inventary",
+                    "type": "Button",
+                    "id": "14830cde-a688-41fb-8d45-32af9640ea85",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -127,7 +136,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Roll",
+                    "action": "jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -138,7 +147,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Roll",
+                    "action": "jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -253,6 +262,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "33237d9d-711d-4775-bfaf-a94b8cb6cc94",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "2D Vector",
                     "id": "8777c4e8-ad82-4bb8-8a39-308d7ebac1b3",
                     "path": "2DVector",
@@ -320,34 +340,23 @@
                 },
                 {
                     "name": "",
-                    "id": "bf704041-8ba7-455b-b121-cfcefa621ebb",
-                    "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Camera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "432cc084-40d6-43c8-8eb3-f822d17c3711",
+                    "id": "97a0ea7d-136d-4fc7-8d52-60bf7df5228c",
                     "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Inventory",
+                    "action": "inventary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "1309b4c9-7bfb-4682-99b6-5fa5eb7248f6",
+                    "id": "b0e3dae2-b081-4197-818a-6ef164c7d302",
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Inventory",
+                    "action": "inventary",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
