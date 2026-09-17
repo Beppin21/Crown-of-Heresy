@@ -1,39 +1,61 @@
 using UnityEngine;
-
-// Cualquier objeto con el que el jugador pueda interactuar (levantar, abrir, activar)
-// concreta (cofre, puerta, palanca...)-.
-public interface IInteractable
-{
-    void Interact(GameObject interactor);
-}
+using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("Raycast de interacción")]
-    [SerializeField] private Transform cameraTransform; 
-    [SerializeField] private float interactRange = 3f;
+    [Header("Configuración de Interacción")]
+    [SerializeField] private float interactRange = 2.5f;
     [SerializeField] private LayerMask interactableLayer;
+    [SerializeField] private float rayHeight = 1f; // Altura de origen respecto a los pies
+
+    private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            TryInteract();
+        }
+    }
 
     public void TryInteract()
     {
+        // Origen en el centro/pecho del personaje y dirección frontal de su propio cuerpo
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+        Vector3 direction = transform.forward;
+
         bool hitSomething = Physics.Raycast(
-            cameraTransform.position,
-            cameraTransform.forward,
+            origin,
+            direction,
             out RaycastHit hit,
             interactRange,
             interactableLayer);
 
-        if (!hitSomething) return;
+        if (hitSomething)
+        {
+            Debug.DrawRay(origin, direction * hit.distance, Color.green, 2f);
+            Debug.Log($"Raycast impactó contra: {hit.collider.name}");
 
-        IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-        if (interactable != null)
-            interactable.Interact(gameObject);
+            // Busca IInteractable en el collider impactado o en su objeto padre (ej. Puerta_Bisagra)
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable != null)
+            {
+                interactable.Interact(gameObject);
+            }
+            else
+            {
+                Debug.LogWarning($"Impactó contra {hit.collider.name}, pero no tiene script interactuable.");
+            }
+        }
+        else
+        {
+            Debug.DrawRay(origin, direction * interactRange, Color.red, 1f);
+            Debug.Log("No hay nada interactuable frente al personaje.");
+        }
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (cameraTransform == null) return;
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(cameraTransform.position, cameraTransform.position + cameraTransform.forward * interactRange);
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+        Gizmos.DrawLine(origin, origin + transform.forward * interactRange);
     }
 }
