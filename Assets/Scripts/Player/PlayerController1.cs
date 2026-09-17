@@ -374,6 +374,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         interaction.TryInteract();
     }
 
+    // TODO: implementar salto real. Stub agregado solo para satisfacer PlayerInputActions.IPlayerActions.
+    public void OnJump(InputAction.CallbackContext context)
+    {
+    }
+
+    // TODO: implementar apertura de inventario. Stub agregado solo para satisfacer PlayerInputActions.IPlayerActions.
+    public void OnInventary(InputAction.CallbackContext context)
+    {
+    }
+
     // ---------------------------------------------------------------
     // LOCK-ON
     // ---------------------------------------------------------------
