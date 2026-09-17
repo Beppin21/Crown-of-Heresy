@@ -18,7 +18,10 @@ public class WeaponHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        OnHit?.Invoke(other); // "?." = invocá el evento solo si hay alguien suscripto (evita un NullReferenceException)
+        // Si el collider que tocó tiene el tag Player, lo ignora de inmediato
+        if (other.CompareTag("Player")) return;
+
+        OnHit?.Invoke(other);
     }
 
     // Lo llama PlayerCombat para "prender" el hitbox justo cuando el arma empieza a conectar,

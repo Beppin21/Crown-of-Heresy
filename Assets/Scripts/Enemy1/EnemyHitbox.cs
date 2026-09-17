@@ -7,23 +7,20 @@ public class EnemyHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 1. Ignorar si choca contra partes del propio enemigo
-        if (other.transform.root == transform.root) return;
+        // 1. Verifica si el objeto impactado tiene el Tag "Player"
+        if (!other.CompareTag("Player")) return;
 
-        // 2. Si impacta contra el Player
-        if (other.CompareTag("Player"))
+        // 2. Busca IDamageable en el collider o en el objeto raíz del jugador
+        IDamageable playerDamageable = other.GetComponentInParent<IDamageable>();
+        if (playerDamageable != null)
         {
-            Debug.Log($"¡Ataque conectado! Daño al jugador: {damage}");
+            playerDamageable.TakeDamage(damage);
 
-            // Frena el dash al golpear
-            enemyDasher.InterruptDash();
-        }
-
-        // 3. Si choca contra una pared, columna o esquina sólida (no trigger)
-        else if (!other.isTrigger)
-        {
-            Debug.Log($"Impacto contra obstáculo ({other.name}). Ataque abortado.");
-            enemyDasher.InterruptDash();
+            // 3. Frena la embestida en seco para que no siga empujando al jugador
+            if (enemyDasher != null)
+            {
+                enemyDasher.InterruptDash();
+            }
         }
     }
 }

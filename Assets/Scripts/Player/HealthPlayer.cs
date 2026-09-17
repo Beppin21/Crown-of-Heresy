@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Script de vida del jugador
 public class PlayerHealth : MonoBehaviour, IDamageable
@@ -12,28 +14,41 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [Tooltip("Tildado, muestra en la consola cada vez que el jugador recibe daño o muere.")]
     [SerializeField] private bool debugLogs = true;
 
-    private bool isDead;
+    [Header("UI de Vida")]
+    [SerializeField] private TextMeshProUGUI healthText;
 
+
+    private bool isDead;
     // Delegate + event: avisa cuando el jugador muere
     public delegate void DeathHandler();
     public event DeathHandler OnDeath;
 
     // Al arrancar, la vida actual empieza en el máximo.
-    private void Awake()
+    private void Start()
     {
         currentHealth = maxHealth;
+        UpdateHealthUI();
     }
 
-   
-    public void TakeDamage(float amount, float poiseDamage)
+    public void TakeDamage(float amount)
     {
-        if (isDead) return;
+        currentHealth = Mathf.Max(0f, currentHealth - amount); // Evita números negativos
+        Debug.Log($"¡El jugador recibió {amount} de daño! Vida restante: {currentHealth}");
 
-        currentHealth = Mathf.Max(0f, currentHealth - amount);
-        Log($"Recibió {amount} de daño. Vida: {currentHealth}/{maxHealth}");
+        UpdateHealthUI();
 
         if (currentHealth <= 0f)
+        {
             Die();
+        }
+    }
+
+    private void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            healthText.text = $"HP: {Mathf.CeilToInt(currentHealth)} / {maxHealth}";
+        }
     }
 
     // Cura una cantidad fija de vida, sin pasarse nunca del máximo.
@@ -42,6 +57,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (isDead) return;
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
         Log($"Curó {amount}. Vida: {currentHealth}/{maxHealth}");
+        UpdateHealthUI();
     }
 
     // Se llama una sola vez, cuando la vida llega a 0: marca al jugador como muerto y
@@ -50,11 +66,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        Log("El jugador murió.");
-        OnDeath?.Invoke();
+        SceneManager.LoadScene("Dungeon");
     }
 
-    
     private void Log(string message)
     {
         if (debugLogs)
