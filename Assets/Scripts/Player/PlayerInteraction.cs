@@ -1,34 +1,40 @@
 using UnityEngine;
-
-public interface IInteractable
-{
-    void Interact(GameObject interactor);
-}
+using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("Raycast de interacción")]
-    [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float interactRange = 3f;
+    [Header("Configuración de Interacción")]
+    [SerializeField] private float interactRange = 2.5f;
     [SerializeField] private LayerMask interactableLayer;
+    [SerializeField] private float rayHeight = 1f; // Altura de origen respecto a los pies
+
+    private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            TryInteract();
+        }
+    }
 
     public void TryInteract()
     {
-        if (cameraTransform == null) return;
+        // Origen en el centro/pecho del personaje y dirección frontal de su propio cuerpo
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+        Vector3 direction = transform.forward;
 
         bool hitSomething = Physics.Raycast(
-            cameraTransform.position,
-            cameraTransform.forward,
+            origin,
+            direction,
             out RaycastHit hit,
             interactRange,
             interactableLayer);
 
         if (hitSomething)
         {
-            // Rayo verde visible en Scene y Game por 2 segundos si impactó algo válido
-            Debug.DrawRay(cameraTransform.position, cameraTransform.forward * hit.distance, Color.green, 2f);
+            Debug.DrawRay(origin, direction * hit.distance, Color.green, 2f);
+            Debug.Log($"Raycast impactó contra: {hit.collider.name}");
 
-            // Busca la interfaz en el collider tocado o en cualquiera de sus padres
+            // Busca IInteractable en el collider impactado o en su objeto padre (ej. Puerta_Bisagra)
             IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
             if (interactable != null)
             {
@@ -36,21 +42,20 @@ public class PlayerInteraction : MonoBehaviour
             }
             else
             {
-                Debug.Log($"Chocó contra {hit.collider.name}, pero no tiene IInteractable ni en él ni en su padre.");
+                Debug.LogWarning($"Impactó contra {hit.collider.name}, pero no tiene script interactuable.");
             }
         }
         else
         {
-            // Rayo rojo visible por 1 segundo si el raycast no alcanzó nada
-            Debug.DrawRay(cameraTransform.position, cameraTransform.forward * interactRange, Color.red, 1f);
+            Debug.DrawRay(origin, direction * interactRange, Color.red, 1f);
+            Debug.Log("No hay nada interactuable frente al personaje.");
         }
     }
 
-    // OnDrawGizmos se dibuja SIEMPRE en la Scene view (no exige tener al Player seleccionado)
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
-        if (cameraTransform == null) return;
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(cameraTransform.position, cameraTransform.position + cameraTransform.forward * interactRange);
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+        Gizmos.DrawLine(origin, origin + transform.forward * interactRange);
     }
 }

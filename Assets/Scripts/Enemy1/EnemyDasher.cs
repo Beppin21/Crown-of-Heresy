@@ -3,6 +3,12 @@ using System.Collections;
 
 public class EnemyDasher : MonoBehaviour
 {
+    [Header("Vida y Recompensa")]
+    [SerializeField] private float maxHealth = 50f;
+    [SerializeField] private GameObject lootPrefab; // Arrastrá acá tu prefab Loot_Drop
+    private float currentHealth;
+    private bool isDead = false;
+
     [Header("Detección")]
     [SerializeField] private float detectionRange = 10f;
 
@@ -26,9 +32,9 @@ public class EnemyDasher : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        currentHealth = maxHealth;
 
-        // Busca al player por tag si no está asignado
+        rb = GetComponent<Rigidbody>();
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
@@ -48,6 +54,12 @@ public class EnemyDasher : MonoBehaviour
             {
                 StartCoroutine(AttackRoutine());
             }
+        }
+
+        if (UnityEngine.InputSystem.Keyboard.current != null &&
+        UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            TakeDamage(25f);
         }
     }
 
@@ -154,8 +166,38 @@ public class EnemyDasher : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        Debug.Log($"Enemigo recibió {amount} de daño.");
-        TurnTowardsTarget();
+        if (isDead) return;
+
+        currentHealth -= amount;
+        Debug.Log($"Enemigo recibió {amount} de daño. Vida restante: {currentHealth}");
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+        }
+        else
+        {
+            TurnTowardsTarget(); // Si sobrevive, se da vuelta a confrontar
+        }
+    }
+
+    private void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        // 1. Instancia el ítem de loot ligeramente elevado sobre el suelo
+        if (lootPrefab != null)
+        {
+            Instantiate(lootPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogWarning("No asignaste el lootPrefab en el Inspector del enemigo.");
+        }
+
+        // 2. Destruye al enemigo de la escena
+        Destroy(gameObject);
     }
 
     // Provisorio: se activa al chocar físicamente con el cubo del Player

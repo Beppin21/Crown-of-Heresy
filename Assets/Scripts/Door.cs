@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Door : MonoBehaviour, IInteractable
 {
-    [SerializeField] private float openAngle = 90f;
+    [SerializeField] private float openAngle = -90f;
     [SerializeField] private float openSpeed = 180f; // Grados por segundo
 
     private bool isOpen = false;
