@@ -21,9 +21,10 @@ public class Combat1 : MonoBehaviour {
     [SerializeField] private LayerMask hittableLayers;   // a qué capas puede golpear el arma
 
     [Header("Ataque")]
-    [SerializeField] private float damage = 15f;
-    [SerializeField] private float attackCooldown = 0.6f;   // tiempo mínimo entre un ataque y el siguiente
-    [SerializeField] private float hitboxActiveTime = 0.2f; // cuánto tiempo queda prendido el hitbox por golpe
+    [SerializeField] private float damage = 25f;
+    [SerializeField] private float attackCooldown = 0.4f;
+    [SerializeField] private float hitboxDelay = 0.25f;      // Tiempo de anticipación antes de prender el collider
+    [SerializeField] private float hitboxActiveTime = 0.15f;  // Duración de la ventana de impacto
 
     [Header("Debug")]
     [Tooltip("Tildado, muestra en la consola cada paso del ataque (input recibido, hitbox on/off, a qué le pegó, etc.)")]
@@ -88,21 +89,29 @@ public class Combat1 : MonoBehaviour {
 
     // Coroutine simple: dispara la animación (si hay Animator), prende el hitbox durante
     // "hitboxActiveTime" y lo vuelve a apagar. Nada de combos ni ventanas de bloqueo.
-    private IEnumerator AttackRoutine() {
+    private IEnumerator AttackRoutine()
+    {
         isAttacking = true;
         lastAttackTime = Time.time;
 
         if (animator != null)
             animator.SetTrigger("Attack");
 
-        if (weaponHitbox != null) {
+        // 1. Espera a que el brazo tome impulso
+        yield return new WaitForSeconds(hitboxDelay);
+
+        // 2. Prende el hitbox durante el recorrido del tajo
+        if (weaponHitbox != null)
+        {
             weaponHitbox.SetHitboxEnabled(true);
             Log("Hitbox activado.");
         }
 
         yield return new WaitForSeconds(hitboxActiveTime);
 
-        if (weaponHitbox != null) {
+        // 3. Apaga el hitbox apenas termina el tajo
+        if (weaponHitbox != null)
+        {
             weaponHitbox.SetHitboxEnabled(false);
             Log("Hitbox desactivado.");
         }
@@ -129,7 +138,7 @@ public class Combat1 : MonoBehaviour {
             return;
         }
 
-        damageable.TakeDamage(damage, 0f); // 0 = Combat1 no maneja poise, solo vida
+        damageable.TakeDamage(damage); // 0 = Combat1 no maneja poise, solo vida
         Log($"Impacto confirmado en '{other.name}': {damage} de daño.");
     }
 

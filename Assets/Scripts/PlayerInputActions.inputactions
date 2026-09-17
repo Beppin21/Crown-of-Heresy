@@ -61,15 +61,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LockOn",
-                    "type": "Button",
-                    "id": "f30ce3ce-ccd8-4ff0-94f9-58d80c348b65",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "UseItem",
                     "type": "Button",
                     "id": "be96b67e-ca3b-4d33-a6a9-e808f7566bf1",
@@ -82,6 +73,24 @@
                     "name": "Interact",
                     "type": "Button",
                     "id": "cef0b023-aa82-4fdc-8c3b-a783d2e9d003",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Camera",
+                    "type": "PassThrough",
+                    "id": "69e6a5da-0e2c-4bac-a2ac-ce3d13a8523f",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Inventory",
+                    "type": "Button",
+                    "id": "4d811075-1b51-4d8e-8106-80188a9b708d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -156,7 +165,7 @@
                 {
                     "name": "",
                     "id": "e4697665-11bd-48a5-a0be-2b887ab4ffd5",
-                    "path": "<Gamepad>/leftTrigger",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -205,28 +214,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9f181f05-ea9f-42d6-a422-e792c4b79c81",
-                    "path": "<Keyboard>/r",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "LockOn",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "5694b6b2-d2dc-447c-bdf2-4389ef0698a7",
-                    "path": "<Gamepad>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "LockOn",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
