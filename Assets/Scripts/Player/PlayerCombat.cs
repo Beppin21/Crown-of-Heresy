@@ -174,7 +174,7 @@ public class PlayerCombat : MonoBehaviour
         IDamageable damageable = other.GetComponent<IDamageable>();
         if (damageable == null) return;
 
-        damageable.TakeDamage(finalDamage, activeAttack.poiseDamage);
+        damageable.TakeDamage(finalDamage);
         stats.TriggerRally(finalDamage); // "Adrenalina": golpear rápido devuelve parte de la vida perdida hace poco
     }
 
@@ -302,10 +302,7 @@ public class WeaponData
 // PlayerStats también la implementa, para que un enemigo pueda dañar al jugador de la misma forma.
 // Es, de hecho, el mismo caso que el Dependency Inversion 
 // PlayerCombat no depende de una clase concreta "Enemigo", depende de esta abstracción.
-public interface IDamageable
-{
-    void TakeDamage(float amount, float poiseDamage);
-}
+
 
 // Cualquier cosa que pueda quedar "abierta" tras un parry exitoso implementa esta interfaz
 // (normalmente los enemigos, para que el jugador pueda castigarlos con un golpe crítico).

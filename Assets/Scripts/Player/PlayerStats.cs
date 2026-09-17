@@ -101,12 +101,11 @@ public class PlayerStats : MonoBehaviour, IDamageable
     // ---------------------------------------------------------------
 
     // Aplica daño a la vida y al poise; si la vida llega a 0, dispara la muerte.
-    public void TakeDamage(float amount, float poiseDamage)
+    public void TakeDamage(float amount)
     {
         if (isDead || isInvulnerable) return; // durante los i-frames el daño se ignora directamente, sin excepciones
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
-        currentPoise = Mathf.Max(0f, currentPoise - poiseDamage);
 
         // Rally: la vida recién perdida queda "marcada" como recuperable durante rallyWindowDuration
         regainableHealth += amount;
@@ -283,7 +282,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
             if (effect.timeSinceLastTick >= 1f) // hace su daño una vez por segundo
             {
-                TakeDamage(effect.tickDamage, 0f);
+                TakeDamage(effect.tickDamage);
                 effect.timeSinceLastTick = 0f;
             }
 
