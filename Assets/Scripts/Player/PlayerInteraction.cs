@@ -10,7 +10,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (InputSystem.actions.FindAction("Interact").WasPressedThisFrame())
         {
             TryInteract();
         }

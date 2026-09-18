@@ -24806,6 +24806,22 @@ PrefabInstance:
       propertyPath: interactRange
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 6452219096713939464, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: distance
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6452219096713939464, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: offset.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6452219096713939464, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: sensitivityX
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6452219096713939464, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: sensitivityY
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7153905621492208186, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
       propertyPath: hitboxDelay
       value: 0.5
