@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyDasher : MonoBehaviour, IDamageable
 {
     [Header("Invulnerabilidad")]
-    [SerializeField] private float damageCooldown = 1f; // Tiempo mínimo entre impactos
+    [SerializeField] private float damageCooldown = 1.5f; // Tiempo mínimo entre impactos
     private float lastDamageTime = -999f;
 
     [Header("Feedback de Daño")]
@@ -184,7 +184,7 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
-        // Si todavía no pasó 1 segundo desde el último golpe, ignora el daño
+        // Si todavía no pasó damageCooldown desde el último golpe, ignora el daño
         if (Time.time - lastDamageTime < damageCooldown)
         {
             Debug.Log($"Golpe ignorado: enemigo invulnerable (faltan {damageCooldown - (Time.time - lastDamageTime):F2}s)");

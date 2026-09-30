@@ -66366,6 +66366,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1461460886}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1944251635 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6082451669636614173, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+  m_PrefabInstance: {fileID: 2525243219839001035}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1945432603
 Mesh:
   m_ObjectHideFlags: 0
@@ -73739,6 +73744,14 @@ PrefabInstance:
       propertyPath: sensitivityY
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7153905621492208186, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: weaponSocket
+      value: 
+      objectReference: {fileID: 1944251635}
+    - target: {fileID: 7153905621492208186, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
+      propertyPath: equippedWeapon
+      value: 
+      objectReference: {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
     - target: {fileID: 7685070442220964070, guid: b94d94888c26ebc40826de2c79df69bc, type: 3}
       propertyPath: m_Name
       value: Player
