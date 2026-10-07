@@ -16,6 +16,7 @@ public class PlayerCombat : MonoBehaviour
     private Animator animator;
     private PlayerStats stats;
     private PlayerController playerController;
+    private PlayerWeaponSheath sheath; // opcional: si está, hay que desenvainar antes de atacar
 
     // LIST: la secuencia de golpes livianos. El índice del combo avanza con cada golpe conectado
     // y se reinicia solo si el jugador tarda demasiado en encadenar el siguiente 
@@ -63,9 +64,10 @@ public class PlayerCombat : MonoBehaviour
     // Al arrancar, busca los componentes que necesita en el mismo GameObject.
     private void Awake()
     {
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>(); // el Animator vive en el modelo (hijo)
         stats = GetComponent<PlayerStats>();
         playerController = GetComponent<PlayerController>();
+        sheath = GetComponent<PlayerWeaponSheath>();
 
         if (weaponHitbox == null)
             Debug.LogWarning("PlayerCombat necesita una referencia a WeaponHitbox asignada en el Inspector.");
@@ -90,6 +92,25 @@ public class PlayerCombat : MonoBehaviour
     // Llamado desde PlayerController cuando el jugador aprieta ataque y el personaje está libre
     public void PerformAttack(bool isHeavy)
     {
+        // En modo lámpara (Town) no se pelea: el clic derecho acerca la cámara a la lámpara
+        if (ZoneSettings.LanternMode) return;
+
+        // Con la espada guardada, primero se desenvaina y el golpe sale al terminar la animación
+        if (sheath != null)
+        {
+            if (!sheath.IsDrawn || sheath.IsBusy)
+            {
+                sheath.DrawThen(() =>
+                {
+                    PlayerState state = playerController.CurrentState;
+                    if (state != PlayerState.Dead && state != PlayerState.Rolling && state != PlayerState.Staggered)
+                        PerformAttack(isHeavy);
+                });
+                return;
+            }
+            sheath.NotifyCombatAction();
+        }
+
         AttackData attack = isHeavy ? heavyAttack : GetCurrentLightAttack();
         WeaponData weapon = weaponDatabase[equippedWeapon];
         float finalStaminaCost = attack.staminaCost * weapon.staminaCostMultiplier;
@@ -201,6 +222,12 @@ public class PlayerCombat : MonoBehaviour
     // Llamado desde PlayerController apenas se presiona el botón de bloqueo
     public void StartBlocking()
     {
+        if (ZoneSettings.LanternMode) return; // en modo lámpara no se pelea
+
+        // Para bloquear con la espada hay que tenerla en la mano (si está guardada, la saca)
+        if (sheath != null)
+            sheath.DrawThen(null);
+
         isBlocking = true;
         animator.SetBool("IsBlocking", true);
         StartCoroutine(ParryWindowRoutine());

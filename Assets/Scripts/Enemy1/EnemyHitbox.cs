@@ -14,7 +14,18 @@ public class EnemyHitbox : MonoBehaviour
         IDamageable playerDamageable = other.GetComponentInParent<IDamageable>();
         if (playerDamageable != null)
         {
-            playerDamageable.TakeDamage(damage);
+            // Si el jugador tiene PlayerCombat, primero se le da la chance de bloquear/parrear:
+            // TryDefend devuelve el daño que finalmente pasa (0 si fue parry perfecto).
+            float finalDamage = damage;
+            PlayerCombat playerCombat = other.GetComponentInParent<PlayerCombat>();
+            if (playerCombat != null)
+            {
+                GameObject attacker = enemyDasher != null ? enemyDasher.gameObject : gameObject;
+                finalDamage = playerCombat.TryDefend(attacker, damage, damage);
+            }
+
+            if (finalDamage > 0f)
+                playerDamageable.TakeDamage(finalDamage);
 
             // 3. Frena la embestida en seco para que no siga empujando al jugador
             if (enemyDasher != null)
