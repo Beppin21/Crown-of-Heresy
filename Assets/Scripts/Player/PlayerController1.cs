@@ -37,7 +37,15 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float lockOnRadius = 15f;
     [SerializeField] private LayerMask enemyLayer;
 
+    public void OnCamera(InputAction.CallbackContext context)
+    {
+      // Por ahora vacío. Acá va la lógica de la cámara.
+    }
 
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+      // Por ahora vacío. Acá va la lógica del inventario.
+    }
     private readonly Dictionary<PlayerState, string> stateAnimTrigger = new Dictionary<PlayerState, string>()
     {
         { PlayerState.Rolling,   "Roll" },
