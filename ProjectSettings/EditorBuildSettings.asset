@@ -9,11 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 194e8c5bc6c94f14f81fbdf6d560c44e
   - enabled: 1
-    path: Assets/Scenes/Town.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
     path: Assets/Scenes/Mission_Controls.unity
     guid: bac85b4a2b045c44ca1ea746adf8b916
+  - enabled: 1
+    path: Assets/Scenes/Town.unity
+    guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
     path: Assets/Scenes/Dungeon.unity
     guid: 6cf56d303875ff845adbab269d974f6e
