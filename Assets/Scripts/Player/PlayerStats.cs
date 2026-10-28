@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 // Este script es el "modelo de datos" del personaje: vida, estamina, poise (resistencia a que
@@ -13,6 +14,9 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [Header("Vida")]
     [SerializeField] private float maxHealth = 100f;
     private float currentHealth;
+
+    [Header("UI de Vida")]
+    [SerializeField] private TextMeshProUGUI healthText;
 
     [Header("Botiquín (curación limitada: cargas finitas, típico de survival horror)")]
     [SerializeField] private int maxEstusCharges = 3;
@@ -85,6 +89,20 @@ public class PlayerStats : MonoBehaviour, IDamageable
         currentStamina = maxStamina;
         currentPoise = maxPoise;
         currentEstusCharges = maxEstusCharges;
+
+        OnHealthChanged += UpdateHealthUI; // el texto de vida se actualiza solo con cada cambio
+    }
+
+    private void Start()
+    {
+        UpdateHealthUI(currentHealth, maxHealth);
+    }
+
+    // Muestra la vida en el texto de la UI (si hay uno asignado).
+    private void UpdateHealthUI(float current, float max)
+    {
+        if (healthText != null)
+            healthText.text = $"HP: {Mathf.CeilToInt(current)} / {max}";
     }
 
     // Corre cada frame: regenera estamina y poise, y actualiza efectos de estado y adrenalina.
@@ -101,12 +119,11 @@ public class PlayerStats : MonoBehaviour, IDamageable
     // ---------------------------------------------------------------
 
     // Aplica daño a la vida y al poise; si la vida llega a 0, dispara la muerte.
-    public void TakeDamage(float amount, float poiseDamage)
+    public void TakeDamage(float amount)
     {
         if (isDead || isInvulnerable) return; // durante los i-frames el daño se ignora directamente, sin excepciones
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
-        currentPoise = Mathf.Max(0f, currentPoise - poiseDamage);
 
         // Rally: la vida recién perdida queda "marcada" como recuperable durante rallyWindowDuration
         regainableHealth += amount;
@@ -283,7 +300,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
             if (effect.timeSinceLastTick >= 1f) // hace su daño una vez por segundo
             {
-                TakeDamage(effect.tickDamage, 0f);
+                TakeDamage(effect.tickDamage);
                 effect.timeSinceLastTick = 0f;
             }
 

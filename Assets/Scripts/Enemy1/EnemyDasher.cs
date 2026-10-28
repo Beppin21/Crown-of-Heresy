@@ -1,8 +1,25 @@
 using UnityEngine;
 using System.Collections;
 
-public class EnemyDasher : MonoBehaviour
+public class EnemyDasher : MonoBehaviour, IDamageable
 {
+    [Header("Invulnerabilidad")]
+    [SerializeField] private float damageCooldown = 1.5f; // Tiempo mínimo entre impactos
+    private float lastDamageTime = -999f;
+
+    [Header("Feedback de Daño")]
+    [SerializeField] private Color damageFlashColor = Color.red;
+    [SerializeField] private float flashDuration = 0.12f;
+    private Renderer[] enemyRenderers;
+    private Color[] originalColors;
+    private Coroutine flashCoroutine;
+
+    [Header("Vida y Recompensa")]
+    [SerializeField] private float maxHealth = 50f;
+    [SerializeField] private GameObject lootPrefab; // Arrastrá acá tu prefab Loot_Drop
+    private float currentHealth;
+    private bool isDead = false;
+
     [Header("Detección")]
     [SerializeField] private float detectionRange = 10f;
 
@@ -26,13 +43,24 @@ public class EnemyDasher : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        currentHealth = maxHealth;
 
-        // Busca al player por tag si no está asignado
+        rb = GetComponent<Rigidbody>();
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
             player = playerObj.transform;
+        }
+
+        // Cachea los renderers del modelo visual para no instanciar materiales de más
+        Transform targetVisual = visualTransform != null ? visualTransform : transform;
+        enemyRenderers = targetVisual.GetComponentsInChildren<Renderer>();
+        originalColors = new Color[enemyRenderers.Length];
+
+        for (int i = 0; i < enemyRenderers.Length; i++)
+        {
+            // Guarda el color actual del material
+            originalColors[i] = enemyRenderers[i].material.color;
         }
     }
 
@@ -154,18 +182,69 @@ public class EnemyDasher : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        Debug.Log($"Enemigo recibió {amount} de daño.");
-        TurnTowardsTarget();
-    }
+        if (isDead) return;
 
-    // Provisorio: se activa al chocar físicamente con el cubo del Player
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Solo reacciona si no está en pleno ataque/cooldown y si quien lo tocó fue el Player
-        if (!isAttacking && collision.collider.CompareTag("Player"))
+        // Si todavía no pasó damageCooldown desde el último golpe, ignora el daño
+        if (Time.time - lastDamageTime < damageCooldown)
+        {
+            Debug.Log($"Golpe ignorado: enemigo invulnerable (faltan {damageCooldown - (Time.time - lastDamageTime):F2}s)");
+            return;
+        }
+
+        lastDamageTime = Time.time; // Registra el momento del impacto
+
+        currentHealth -= amount;
+        Debug.Log($"Enemigo recibió {amount} de daño. Vida restante: {currentHealth}");
+
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+        flashCoroutine = StartCoroutine(DamageFlashRoutine());
+
+        if (currentHealth <= 0f)
+        {
+            Die();
+        }
+        else
         {
             TurnTowardsTarget();
         }
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        // 1. Pinta todos los materiales de rojo
+        for (int i = 0; i < enemyRenderers.Length; i++)
+        {
+            if (enemyRenderers[i] != null)
+                enemyRenderers[i].material.color = damageFlashColor;
+        }
+
+        yield return new WaitForSeconds(flashDuration);
+
+        // 2. Restaura los colores de fábrica
+        for (int i = 0; i < enemyRenderers.Length; i++)
+        {
+            if (enemyRenderers[i] != null)
+                enemyRenderers[i].material.color = originalColors[i];
+        }
+    }
+
+    private void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        // 1. Instancia el ítem de loot ligeramente elevado sobre el suelo
+        if (lootPrefab != null)
+        {
+            Instantiate(lootPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogWarning("No asignaste el lootPrefab en el Inspector del enemigo.");
+        }
+
+        // 2. Destruye al enemigo de la escena
+        Destroy(gameObject);
     }
 
     public void TurnTowardsTarget()
