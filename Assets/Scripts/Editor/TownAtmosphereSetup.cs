@@ -409,6 +409,34 @@ public static class TownAtmosphereSetup
                       "cambialo en Incendio > Fire Ignition (también se puede prender al acercarse el jugador).");
     }
 
+    // Borra todos los incendios de las escenas abiertas (los objetos "Incendio" que cuelgan de las
+    // casas). Los edificios no se tocan: la herramienta de fuego solo les agrega ese hijo.
+    [MenuItem("Tools/Town/Apagar todos los incendios")]
+    private static void RemoveAllFires()
+    {
+        List<GameObject> fires = new List<GameObject>();
+        foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (t.name == FireRootName && !EditorUtility.IsPersistent(t.gameObject))
+                fires.Add(t.gameObject);
+        }
+
+        if (fires.Count == 0)
+        {
+            EditorUtility.DisplayDialog("Apagar incendios", "No hay ningún incendio en las escenas abiertas.", "OK");
+            return;
+        }
+
+        foreach (GameObject fire in fires)
+        {
+            string owner = fire.transform.parent != null ? fire.transform.parent.name : "(raíz)";
+            Debug.Log($"[TownAtmosphere] Incendio de '{owner}' apagado.");
+            EditorSceneManager.MarkSceneDirty(fire.scene);
+            Undo.DestroyObjectImmediate(fire);
+        }
+        Debug.Log($"[TownAtmosphere] {fires.Count} incendio(s) borrados. Guardá la escena (Ctrl+S); Ctrl+Z lo deshace.");
+    }
+
     // ---------------------------------------------------------------
     // SILUETAS EN LA NIEBLA
     // ---------------------------------------------------------------

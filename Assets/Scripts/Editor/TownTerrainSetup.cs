@@ -57,51 +57,6 @@ public static class TownTerrainSetup
     private const float VillageTreeGap = 6f;     // distancia libre entre el pueblo y los primeros árboles
     private const float PathTreeGap = 3f;        // distancia libre a cada lado del camino
 
-    // ---------------------------------------------------------------
-    // RALEAR EL BOSQUE (sin tocar el terreno)
-    // ---------------------------------------------------------------
-
-    [MenuItem("Tools/Town/Ralear bosque/Sacar 25% de los árboles")]
-    private static void Thin25() => ThinForest(0.25f);
-
-    [MenuItem("Tools/Town/Ralear bosque/Sacar 50% de los árboles")]
-    private static void Thin50() => ThinForest(0.5f);
-
-    // Saca una parte de los árboles de "Bosque", sobre todo los más alejados del pueblo (los que
-    // casi siempre quedan tapados por la niebla), así cerca del pueblo y del camino sigue tupido.
-    // Se puede deshacer con Ctrl+Z.
-    private static void ThinForest(float fraction)
-    {
-        GameObject forest = GameObject.Find(ForestRootName);
-        if (forest == null || forest.transform.childCount == 0)
-        {
-            EditorUtility.DisplayDialog("Ralear bosque", $"No hay un objeto '{ForestRootName}' con árboles en la escena abierta.", "OK");
-            return;
-        }
-
-        Vector3 center = FindPlayerSpawn();
-        System.Random random = new System.Random();
-
-        // Puntaje: más lejos del pueblo = más chances de salir (con algo de azar, para que no quede un corte prolijo)
-        List<(Transform tree, float score)> trees = new List<(Transform, float)>();
-        foreach (Transform tree in forest.transform)
-        {
-            float distance = Vector3.Distance(new Vector3(tree.position.x, center.y, tree.position.z), center);
-            trees.Add((tree, distance * Mathf.Lerp(0.6f, 1.4f, (float)random.NextDouble())));
-        }
-        trees.Sort((a, b) => b.score.CompareTo(a.score));
-
-        int toRemove = Mathf.RoundToInt(trees.Count * fraction);
-        Undo.SetCurrentGroupName("Ralear bosque");
-        int group = Undo.GetCurrentGroup();
-        for (int i = 0; i < toRemove; i++)
-            Undo.DestroyObjectImmediate(trees[i].tree.gameObject);
-        Undo.CollapseUndoOperations(group);
-
-        EditorSceneManager.MarkSceneDirty(forest.scene);
-        Debug.Log($"[TownTerrain] Bosque raleado: se sacaron {toRemove} árboles, quedan {trees.Count - toRemove}. (Ctrl+Z para deshacer)");
-    }
-
     [MenuItem("Tools/Town/Crear terreno y bosque")]
     private static void Run()
     {
