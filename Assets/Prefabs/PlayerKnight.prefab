@@ -580,28 +580,31 @@ MonoBehaviour:
     m_Bits: 4294967295
   lightComboSequence:
   - animationTrigger: Attack_Light_1
-    damage: 12
+    damageMultiplier: 1
     poiseDamage: 8
     staminaCost: 12
     animationLength: 2.16
   - animationTrigger: Attack_Light_2
-    damage: 14
+    damageMultiplier: 1.17
     poiseDamage: 10
     staminaCost: 14
     animationLength: 2.3400002
   - animationTrigger: Attack_Light_3
-    damage: 20
+    damageMultiplier: 1.67
     poiseDamage: 15
     staminaCost: 18
     animationLength: 1.8
   heavyAttack:
     animationTrigger: Attack_Heavy
-    damage: 35
+    damageMultiplier: 2.92
     poiseDamage: 30
     staminaCost: 30
     animationLength: 2.7
   comboResetTime: 1.2
-  equippedWeapon: LongSword
+  defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
+  startingWeapons:
+  - {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
+  - {fileID: 11400000, guid: 86142d8b9c7b3d047897657f5ca1a89f, type: 2}
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5

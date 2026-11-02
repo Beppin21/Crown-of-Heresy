@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65930b72eb1f4744da3d6cef73e3cda0, type: 3}
   m_Name: Basic Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
-  weaponName: Basic Sword
+  itemName: Basic Sword
+  description: A light blue blade. Quick swings that barely tire you, but each hit stings a little less.
+  value: 50
   weaponType: {fileID: 11400000, guid: 734f7ed836f5cc249b28726bb8e49fd9, type: 2}
   damage: 10
   weight: 3

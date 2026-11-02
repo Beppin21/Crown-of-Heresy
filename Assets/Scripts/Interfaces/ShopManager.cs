@@ -1,4 +1,3 @@
-using NUnit.Framework.Interfaces;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -17,6 +16,10 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private GameObject itemButtonPrefab;   // Botón template para instanciar
 
     [Header("Stock de la Tienda")]
+    [Tooltip("Ítems armados como asset que vende la tienda además de los fijos, por ejemplo armas " +
+             "(WeaponSO). Se suman al stock la primera vez que se abre la tienda en la partida.")]
+    [SerializeField] private List<LootData> itemsForSale = new List<LootData>();
+
     public static List<LootData> staticShopStock;
     private bool isSelling = false;
 
@@ -29,9 +32,14 @@ public class ShopManager : MonoBehaviour
             {
                 LootData.Create("Health Potion", "It lets you recover some health, or thats the idea on some later version", 25),
                 LootData.Create("Weird Key", "It lets you open a door somewhere (this actually works)", 50),
-                LootData.Create("Cool Sword", "A weapon, that you cant equip, deals a lot of damage so its a shame it doesnt work", 80),
                 LootData.Create("Hat", "idk i dont have more ideas", 15)
             };
+
+            foreach (LootData item in itemsForSale)
+            {
+                if (item != null)
+                    staticShopStock.Add(item);
+            }
         }
     }
 
@@ -78,26 +86,40 @@ public class ShopManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        PlayerCombat combat = FindAnyObjectByType<PlayerCombat>();
+
         if (isSelling)
         {
-            // Muestra los ítems que tiene el jugador en el inventario
+            // Muestra los ítems que tiene el jugador en el inventario (las armas equipadas no se
+            // venden: primero hay que desequiparlas desde el inventario)
             for (int i = 0; i < InventoryUI.inventory.Count; i++)
             {
                 LootData item = InventoryUI.inventory[i];
                 int index = i; // Captura de índice para la acción
+                if (item is WeaponSO weapon && combat != null && combat.IsEquipped(weapon)) continue;
 
-                CreateItemButton($"{item.ItemName} | Sell: +${item.Value}", () => SellItem(index));
+                CreateItemButton($"{GetItemLabel(item)} | Sell: +${item.Value}", () => SellItem(index));
             }
         }
         else
         {
-            // Muestra el catálogo de la tienda
+            // Muestra el catálogo de la tienda, sin las armas que el jugador ya tiene
             foreach (LootData item in staticShopStock)
             {
                 LootData currentItem = item;
-                CreateItemButton($"{currentItem.ItemName} | Buy: -${currentItem.Value}", () => BuyItem(currentItem));
+                if (currentItem is WeaponSO && InventoryUI.inventory.Contains(currentItem)) continue;
+
+                CreateItemButton($"{GetItemLabel(currentItem)} | Buy: -${currentItem.Value}", () => BuyItem(currentItem));
             }
         }
+    }
+
+    // Las armas muestran también su daño y su peso
+    private static string GetItemLabel(LootData item)
+    {
+        if (item is WeaponSO weapon)
+            return $"{weapon.ItemName} (Dmg {weapon.Damage}, Wgt {weapon.Weight})";
+        return item.ItemName;
     }
 
     private void CreateItemButton(string text, System.Action onClickAction)
@@ -115,6 +137,15 @@ public class ShopManager : MonoBehaviour
             InventoryUI.inventory.Add(item);
             Debug.Log($"Comprado: {item.ItemName}. Your Money: ${InventoryUI.money}");
             staticShopStock.Remove(item);
+
+            // Un arma comprada se equipa si queda un lugar libre (si no, se equipa desde el inventario)
+            if (item is WeaponSO weapon)
+            {
+                PlayerCombat combat = FindAnyObjectByType<PlayerCombat>();
+                if (combat != null && combat.HasFreeSlot)
+                    combat.EquipToSlot(weapon);
+            }
+
             RefreshList();
         }
         else

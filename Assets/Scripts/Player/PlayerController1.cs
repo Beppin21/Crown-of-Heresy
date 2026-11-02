@@ -470,8 +470,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // BUFFER DE INPUTS
     // ---------------------------------------------------------------
 
-    // Guarda una acción pendiente (por ejemplo, "atacar") para ejecutarla más adelante,
-    // apenas el personaje esté libre de nuevo.
+    // Guarda una acción pendiente (por ejemplo, rodar en medio de un ataque) para ejecutarla
+    // más adelante, apenas el personaje esté libre de nuevo.
     private void BufferInput(System.Action action)
     {
         inputBuffer.Enqueue(action); 
@@ -528,12 +528,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     }
 
     // Se llama al presionar la tecla de ataque liviano.
+    // En medio de un ataque, el golpe se anota directo en el combo (no va al buffer: el buffer
+    // recién corre cuando el personaje vuelve a Idle, y para entonces el combo ya se cortó).
     public void OnLightAttack(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
 
         if (currentState == PlayerState.Attacking)
-            BufferInput(() => combat.QueueNextCombo(false));
+            combat.QueueNextCombo(false); // el próximo golpe sale apenas termine el actual
         else if (currentState != PlayerState.Rolling && currentState != PlayerState.Staggered)
             combat.PerformAttack(false); // false = ataque liviano
     }
@@ -544,7 +546,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!context.performed) return;
 
         if (currentState == PlayerState.Attacking)
-            BufferInput(() => combat.QueueNextCombo(true));
+            combat.QueueNextCombo(true); // remata el combo con el pesado apenas termine el golpe actual
         else if (currentState != PlayerState.Rolling && currentState != PlayerState.Staggered)
             combat.PerformAttack(true); // true = ataque pesado
     }

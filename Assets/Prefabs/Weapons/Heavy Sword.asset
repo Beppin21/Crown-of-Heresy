@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65930b72eb1f4744da3d6cef73e3cda0, type: 3}
   m_Name: Heavy Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
-  weaponName: Heavy Sword
+  itemName: Heavy Sword
+  description: A huge red blade. Slow and tiring to swing, but every hit counts.
+  value: 100
   weaponType: {fileID: 11400000, guid: 734f7ed836f5cc249b28726bb8e49fd9, type: 2}
   damage: 25
   weight: 8
-  modelPrefab: {fileID: 5883250425237761547, guid: 490daf6f5eb5f0d4e97afc6df03eabd1, type: 3}
+  modelPrefab: {fileID: 5883250425237761547, guid: c1aa0711a7ca51fd29b42b300e6291eb, type: 3}
