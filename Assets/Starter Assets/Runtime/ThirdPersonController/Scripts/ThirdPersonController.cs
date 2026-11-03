@@ -75,6 +75,9 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
+        // Lo apaga Combat1 mientras dura un ataque: el personaje no se mueve, no rota ni salta
+        [HideInInspector] public bool CanMove = true;
+
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -213,6 +216,9 @@ namespace StarterAssets
 
         private void Move()
         {
+            // mientras se ataca se ignora el input de movimiento (la gravedad se sigue aplicando)
+            Vector2 move = CanMove ? _input.move : Vector2.zero;
+
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
@@ -220,16 +226,21 @@ namespace StarterAssets
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (move == Vector2.zero) targetSpeed = 0.0f;
 
             // a reference to the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
-            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+            float inputMagnitude = _input.analogMovement ? move.magnitude : 1f;
 
             // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+            if (!CanMove)
+            {
+                // frena en seco al atacar, sin desacelerar de a poco
+                _speed = 0.0f;
+            }
+            else if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
                 // creates curved result rather than a linear one giving a more organic speed change
@@ -249,11 +260,11 @@ namespace StarterAssets
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(move.x, 0.0f, move.y).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
-            if (_input.move != Vector2.zero)
+            if (move != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                   _mainCamera.transform.eulerAngles.y;
@@ -298,6 +309,9 @@ namespace StarterAssets
                 {
                     _verticalVelocity = -2f;
                 }
+
+                // mientras se ataca no se puede saltar: se descarta el input para que no salte solo al terminar
+                if (!CanMove) _input.jump = false;
 
                 // Jump
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f)

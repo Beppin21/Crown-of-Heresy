@@ -12,11 +12,17 @@ public class Bonfire : MonoBehaviour
     {
         if (other.CompareTag("Player") && Time.time >= nextHealTime)
         {
-            // Busca PlayerStats en el collider impactado o en la raíz del personaje
-            PlayerHealth player = other.GetComponentInParent<PlayerHealth>();
-            if (player != null)
+            // Busca PlayerStats (o el PlayerHealth viejo) en el collider impactado o en la raíz del personaje
+            PlayerStats stats = other.GetComponentInParent<PlayerStats>();
+            PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+            if (stats != null)
             {
-                player.Heal(healAmount);
+                stats.Heal(healAmount);
+                nextHealTime = Time.time + healInterval;
+            }
+            else if (health != null)
+            {
+                health.Heal(healAmount);
                 nextHealTime = Time.time + healInterval;
             }
         }

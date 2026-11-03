@@ -1,148 +1,290 @@
 using System.Collections;
+using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Script de combate SIMPLE e INDEPENDIENTE del script de movimiento que uses.
-// A diferencia de PlayerCombat.cs (que tenÌa combos, bloqueo/parry y lock-on, y necesitaba
-// leer/escribir el estado del personaje a travÈs de PlayerController), este script no
-// depende de ning˙n otro script del jugador: solo necesita un WeaponHitbox (hijo del
-// personaje, con su Collider en modo Trigger) y, opcionalmente, un Animator.
+// Script de combate SIMPLE del jugador: necesita un WeaponHitbox (hijo del personaje, con su
+// Collider en modo Trigger, o dentro del modelo del arma), un Animator y un arma equipada (WeaponSO).
+// Si encuentra un ThirdPersonController, le bloquea el movimiento mientras dura el ataque.
 //
-// AsÌ podÈs pegarlo en el mismo GameObject que tenga tu nuevo script de movimiento
-// -sea cual sea- sin que compita por el estado del personaje.
+// El arma equipada define todo el ataque:
+//   - su TIPO (WeaponTypeSO) decide qu√© animaci√≥n se reproduce y en qu√© parte del clip pega;
+//   - su DA√ëO es lo que recibe el enemigo;
+//   - su PESO decide la velocidad de la animaci√≥n (arma liviana = ataque m√°s r√°pido).
 //
-// Requisito: usa la misma acciÛn "LightAttack" del Input Actions asset "PlayerInputActions"
-// que ya armamos (Action Map "Player"). Si tu script de movimiento tambiÈn usa esa acciÛn
-// para otra cosa, no hay problema: cada script escucha el input por su cuenta.
+// Para cambiar la animaci√≥n sin tocar el Animator Controller se usa un AnimatorOverrideController:
+// el estado de ataque del controller tiene un clip "base" (baseAttackClip) que se reemplaza por
+// el clip del tipo de arma equipada. La velocidad se aplica con el par√°metro float "AttackSpeed",
+// que el estado de ataque usa como multiplicador de velocidad.
+//
+// Requisito: usa la acci√≥n "LightAttack" del Input Actions asset "PlayerInputActions"
+// (Action Map "Player").
 public class Combat1 : MonoBehaviour {
-    [Header("Referencias")]
-    [SerializeField] private WeaponHitbox weaponHitbox; // hitbox del arma, hijo del personaje
-    [SerializeField] private Animator animator;          // opcional: si est· asignado, dispara el trigger "Attack"
-    [SerializeField] private LayerMask hittableLayers;   // a quÈ capas puede golpear el arma
+    private static readonly int AttackTrigger = Animator.StringToHash("Attack");
+    private static readonly int AttackSpeedParam = Animator.StringToHash("AttackSpeed");
 
-    [Header("Ataque")]
-    [SerializeField] private float damage = 25f;
-    [SerializeField] private float attackCooldown = 0.4f;
-    [SerializeField] private float hitboxDelay = 0.25f;      // Tiempo de anticipaciÛn antes de prender el collider
-    [SerializeField] private float hitboxActiveTime = 0.15f;  // DuraciÛn de la ventana de impacto
+    [Header("Referencias")]
+    [SerializeField] private WeaponHitbox weaponHitbox; // hitbox por defecto, hijo del personaje
+    [SerializeField] private Animator animator;
+    [SerializeField] private LayerMask hittableLayers;   // a qu√© capas puede golpear el arma
+    [Tooltip("Script de movimiento a bloquear durante el ataque. Si se deja vac√≠o, se busca en el personaje.")]
+    [SerializeField] private ThirdPersonController movementController;
+
+    [Header("Arma")]
+    [SerializeField] private WeaponSO equippedWeapon;
+    [Tooltip("Transform donde se instancia el modelo del arma (WeaponAttach).")]
+    [SerializeField] private Transform weaponSocket;
+    [Tooltip("Clip que tiene hoy el estado de ataque del Animator Controller: es el que se reemplaza por la animaci√≥n del tipo de arma.")]
+    [SerializeField] private AnimationClip baseAttackClip;
+
+    [Header("Cambio r√°pido de arma (provisorio, para pruebas)")]
+    [Tooltip("La tecla 1 equipa el primer arma de la lista, la 2 la segunda, etc. (hasta 9).")]
+    [SerializeField] private WeaponSO[] weaponSlots;
 
     [Header("Debug")]
-    [Tooltip("Tildado, muestra en la consola cada paso del ataque (input recibido, hitbox on/off, a quÈ le pegÛ, etc.)")]
+    [Tooltip("Tildado, muestra en la consola cada paso del ataque (input recibido, hitbox on/off, a qu√© le peg√≥, etc.)")]
     [SerializeField] private bool debugLogs = true;
 
-    private PlayerInputActions inputActions; // misma clase generada por el Input System que usa PlayerController
+    private PlayerInputActions inputActions;
+    private AnimatorOverrideController overrideController;
+    private WeaponHitbox activeHitbox;       // el hitbox en uso (el por defecto o el que trae el modelo del arma)
+    private GameObject currentWeaponModel;
     private bool isAttacking;
-    private float lastAttackTime = -999f;
 
-    // Al arrancar, prepara el Input System y busca el Animator si no se asignÛ a mano.
+    public WeaponSO EquippedWeapon => equippedWeapon;
+
+    // Al arrancar, prepara el Input System, el Animator y el override de animaciones.
     private void Awake() {
         inputActions = new PlayerInputActions();
         inputActions.Player.LightAttack.performed += OnAttackPerformed;
 
         if (animator == null)
-            animator = GetComponent<Animator>(); // por si el Animator est· en el mismo GameObject
+            animator = GetComponent<Animator>(); // por si el Animator est√° en el mismo GameObject
 
-        if (weaponHitbox == null)
-            Debug.LogWarning("[Combat1] Falta asignar WeaponHitbox en el Inspector.", this);
+        if (animator != null && animator.runtimeAnimatorController != null) {
+            overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+            animator.runtimeAnimatorController = overrideController;
+        }
+        else {
+            Debug.LogWarning("[Combat1] Falta el Animator (o su Controller): los ataques no van a tener animaci√≥n.", this);
+        }
 
-        if (animator == null)
-            Log("Sin Animator asignado (ni encontrado en el GameObject) ó el ataque va a funcionar igual, solo que sin animaciÛn.");
+        activeHitbox = weaponHitbox;
+
+        if (movementController == null)
+            movementController = GetComponentInParent<ThirdPersonController>();
+    }
+
+    private void Start() {
+        if (equippedWeapon != null)
+            EquipWeapon(equippedWeapon);
+        else
+            Debug.LogWarning("[Combat1] No hay arma equipada (equippedWeapon): no se va a poder atacar.", this);
+
+        // El hitbox puede venir del Inspector o del modelo del arma equipada
+        if (activeHitbox == null)
+            Debug.LogWarning("[Combat1] No hay WeaponHitbox: ni asignado en el Inspector ni dentro del modelo del arma.", this);
+    }
+
+    // Cambio r√°pido de arma con las teclas num√©ricas (lectura directa del teclado, como en ShopTrigger)
+    private void Update() {
+        if (weaponSlots == null || Keyboard.current == null) return;
+
+        int slotCount = Mathf.Min(weaponSlots.Length, 9);
+        for (int i = 0; i < slotCount; i++) {
+            if (!Keyboard.current[Key.Digit1 + i].wasPressedThisFrame) continue;
+
+            WeaponSO weapon = weaponSlots[i];
+            if (weapon != null && weapon != equippedWeapon)
+                EquipWeapon(weapon);
+            break;
+        }
     }
 
     // Al activarse: prende la escucha de inputs y se suscribe al aviso de golpe del hitbox.
     private void OnEnable() {
         inputActions.Player.Enable();
-        if (weaponHitbox != null)
-            weaponHitbox.OnHit += HandleHit;
+        if (activeHitbox != null)
+            activeHitbox.OnHit += HandleHit;
     }
 
     // Al desactivarse: apaga inputs y se desuscribe (evita llamadas fantasma).
     private void OnDisable() {
         inputActions.Player.Disable();
-        if (weaponHitbox != null)
-            weaponHitbox.OnHit -= HandleHit;
+        if (activeHitbox != null)
+            activeHitbox.OnHit -= HandleHit;
+
+        // Si se desactiva a mitad de un ataque, corta el ataque y devuelve el movimiento
+        if (isAttacking) {
+            StopAllCoroutines();
+            isAttacking = false;
+            if (activeHitbox != null)
+                activeHitbox.SetHitboxEnabled(false);
+            SetMovementLocked(false);
+        }
     }
 
-    // Se llama autom·ticamente cuando se presiona el botÛn de ataque liviano.
+    // ---------------------------------------------------------------
+    // EQUIPAR ARMA
+    // ---------------------------------------------------------------
+
+    // Equipa un arma: cambia la animaci√≥n de ataque por la de su tipo y, si tiene modelo,
+    // lo instancia en el socket. Es p√∫blico para poder llamarlo desde inventario/tienda.
+    public void EquipWeapon(WeaponSO weapon) {
+        if (weapon == null) return;
+
+        if (isAttacking) {
+            Log("No se puede cambiar de arma en medio de un ataque.");
+            return;
+        }
+
+        equippedWeapon = weapon;
+
+        // 1. Animaci√≥n propia del tipo de arma
+        WeaponTypeSO type = weapon.WeaponType;
+        if (type == null || type.AttackClip == null) {
+            Debug.LogWarning($"[Combat1] El arma '{weapon.WeaponName}' no tiene tipo o su tipo no tiene AttackClip.", this);
+        }
+        else if (overrideController != null) {
+            if (baseAttackClip != null)
+                overrideController[baseAttackClip] = type.AttackClip;
+            else
+                Debug.LogWarning("[Combat1] Falta asignar baseAttackClip: se va a usar la animaci√≥n original del Animator.", this);
+        }
+
+        // 2. Modelo del arma (opcional)
+        if (currentWeaponModel != null) {
+            Destroy(currentWeaponModel);
+            currentWeaponModel = null;
+        }
+
+        WeaponHitbox newHitbox = weaponHitbox;
+        if (weapon.ModelPrefab != null && weaponSocket != null) {
+            currentWeaponModel = Instantiate(weapon.ModelPrefab, weaponSocket, false);
+            WeaponHitbox modelHitbox = currentWeaponModel.GetComponentInChildren<WeaponHitbox>();
+            if (modelHitbox != null)
+                newHitbox = modelHitbox;
+        }
+        SetActiveHitbox(newHitbox);
+
+        Log($"Arma equipada: '{weapon.WeaponName}' (tipo {(type != null ? type.TypeName : "ninguno")}, " +
+            $"da√±o {weapon.Damage}, peso {weapon.Weight}, velocidad x{weapon.AttackSpeed:F2}).");
+    }
+
+    // Cambia el hitbox en uso, moviendo la suscripci√≥n al evento OnHit.
+    private void SetActiveHitbox(WeaponHitbox hitbox) {
+        if (hitbox == activeHitbox) return;
+
+        if (activeHitbox != null) {
+            activeHitbox.OnHit -= HandleHit;
+            activeHitbox.SetHitboxEnabled(false);
+        }
+
+        activeHitbox = hitbox;
+
+        if (activeHitbox != null && isActiveAndEnabled)
+            activeHitbox.OnHit += HandleHit;
+    }
+
+    // ---------------------------------------------------------------
+    // ATAQUE
+    // ---------------------------------------------------------------
+
+    // Se llama autom√°ticamente cuando se presiona el bot√≥n de ataque liviano.
     private void OnAttackPerformed(InputAction.CallbackContext context) {
-        Log("Input de ataque recibido (acciÛn LightAttack).");
+        Log("Input de ataque recibido (acci√≥n LightAttack).");
         TryAttack();
     }
 
-    // Intenta arrancar un ataque: si ya hay uno en curso, o no pasÛ el cooldown desde el
-    // ˙ltimo golpe, no hace nada. Es p˙blico por si querÈs dispararlo desde otro script
-    // (por ejemplo, un botÛn de UI o tu script de movimiento) en vez de solo por input.
+    // Intenta arrancar un ataque: si ya hay uno en curso (incluida la recuperaci√≥n) o no
+    // hay arma equipada, no hace nada.
     public void TryAttack() {
         if (isAttacking) {
             Log("Ataque ignorado: ya hay uno en curso.");
             return;
         }
 
-        if (Time.time - lastAttackTime < attackCooldown) {
-            Log($"Ataque ignorado: todavÌa en cooldown (faltan {attackCooldown - (Time.time - lastAttackTime):F2}s).");
+        if (equippedWeapon == null || equippedWeapon.WeaponType == null || equippedWeapon.WeaponType.AttackClip == null) {
+            Log("Ataque ignorado: no hay arma equipada (o su tipo no tiene animaci√≥n).");
             return;
         }
 
-        Log("Ataque iniciado.");
-        StartCoroutine(AttackRoutine());
+        StartCoroutine(AttackRoutine(equippedWeapon));
     }
 
-    // Coroutine simple: dispara la animaciÛn (si hay Animator), prende el hitbox durante
-    // "hitboxActiveTime" y lo vuelve a apagar. Nada de combos ni ventanas de bloqueo.
-    private IEnumerator AttackRoutine()
-    {
+    // Reproduce la animaci√≥n del tipo de arma a la velocidad que da su peso, y prende el
+    // hitbox solo durante la ventana de impacto del clip (escalada por esa misma velocidad).
+    private IEnumerator AttackRoutine(WeaponSO weapon) {
         isAttacking = true;
-        lastAttackTime = Time.time;
+        SetMovementLocked(true); // queda quieto mientras dura la animaci√≥n de ataque
 
-        if (animator != null)
-            animator.SetTrigger("Attack");
+        WeaponTypeSO type = weapon.WeaponType;
+        float speed = weapon.AttackSpeed;
+        float duration = type.AttackClip.length / speed;
+        float hitboxOn = duration * type.HitboxStart;
+        float hitboxOff = duration * type.HitboxEnd;
+        float recovery = weapon.RecoveryTime;
 
-        // 1. Espera a que el brazo tome impulso
-        yield return new WaitForSeconds(hitboxDelay);
+        Log($"Ataque con '{weapon.WeaponName}': velocidad x{speed:F2}, duraci√≥n {duration:F2}s, " +
+            $"hitbox de {hitboxOn:F2}s a {hitboxOff:F2}s, recuperaci√≥n {recovery:F2}s.");
 
-        // 2. Prende el hitbox durante el recorrido del tajo
-        if (weaponHitbox != null)
-        {
-            weaponHitbox.SetHitboxEnabled(true);
+        if (animator != null) {
+            animator.SetFloat(AttackSpeedParam, speed);
+            animator.SetTrigger(AttackTrigger);
+        }
+
+        // 1. Anticipaci√≥n del golpe
+        yield return new WaitForSeconds(hitboxOn);
+
+        // 2. Ventana de impacto
+        if (activeHitbox != null) {
+            activeHitbox.SetHitboxEnabled(true);
             Log("Hitbox activado.");
         }
 
-        yield return new WaitForSeconds(hitboxActiveTime);
+        yield return new WaitForSeconds(hitboxOff - hitboxOn);
 
-        // 3. Apaga el hitbox apenas termina el tajo
-        if (weaponHitbox != null)
-        {
-            weaponHitbox.SetHitboxEnabled(false);
+        if (activeHitbox != null) {
+            activeHitbox.SetHitboxEnabled(false);
             Log("Hitbox desactivado.");
         }
 
+        // 3. Resto de la animaci√≥n: al terminar ya se puede mover
+        yield return new WaitForSeconds(duration - hitboxOff);
+        SetMovementLocked(false);
+
+        // 4. Recuperaci√≥n: se puede mover, pero todav√≠a no volver a atacar
+        yield return new WaitForSeconds(recovery);
+
         isAttacking = false;
-        Log("Ataque terminado, listo para el prÛximo.");
+        Log("Ataque terminado, listo para el pr√≥ximo.");
     }
 
-    // Se ejecuta cuando WeaponHitbox avisa (evento OnHit) que tocÛ algo mientras el
-    // hitbox estaba prendido. Ac· se decide el daÒo, igual que en PlayerCombat.
+    private void SetMovementLocked(bool locked) {
+        if (movementController != null)
+            movementController.CanMove = !locked;
+    }
+
+    // Se ejecuta cuando el hitbox avisa (evento OnHit) que toc√≥ algo mientras estaba prendido.
     private void HandleHit(Collider other) {
-        // Filtro por capa: asÌ el arma no golpea, por ejemplo, al propio jugador.
+        // Filtro por capa: as√≠ el arma no golpea, por ejemplo, al propio jugador.
         if (((1 << other.gameObject.layer) & hittableLayers) == 0) {
-            Log($"Hitbox tocÛ a '{other.name}' pero su capa no est· en Hittable Layers: se ignora.");
+            Log($"Hitbox toc√≥ a '{other.name}' pero su capa no est√° en Hittable Layers: se ignora.");
             return;
         }
 
-        // IDamageable est· definida en PlayerCombat.cs. Si borr·s ese archivo del
-        // proyecto, movela a un script propio (por ejemplo Interfaces.cs) para que
-        // Combat1 siga compilando.
         IDamageable damageable = other.GetComponent<IDamageable>();
         if (damageable == null) {
-            Log($"Hitbox tocÛ a '{other.name}' pero no tiene ning˙n script que implemente IDamageable.");
+            Log($"Hitbox toc√≥ a '{other.name}' pero no tiene ning√∫n script que implemente IDamageable.");
             return;
         }
 
-        damageable.TakeDamage(damage); // 0 = Combat1 no maneja poise, solo vida
-        Log($"Impacto confirmado en '{other.name}': {damage} de daÒo.");
+        float damage = equippedWeapon != null ? equippedWeapon.Damage : 0f;
+        damageable.TakeDamage(damage);
+        Log($"Impacto confirmado en '{other.name}': {damage} de da√±o.");
     }
 
-    // Centraliza el Debug.Log de todo el script: si "debugLogs" est· destildado en el
+    // Centraliza el Debug.Log de todo el script: si "debugLogs" est√° destildado en el
     // Inspector, no imprime nada (para no ensuciar la consola en la build final).
     private void Log(string message) {
         if (debugLogs)
