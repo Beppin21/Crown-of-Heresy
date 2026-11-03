@@ -8,6 +8,15 @@ public class Bonfire : MonoBehaviour
 
     private float nextHealTime;
 
+    // Al llegar a la fogata se guarda la partida (escena y posición del jugador)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        PlayerSave save = other.GetComponentInParent<PlayerSave>();
+        if (save != null) save.GuardarPartida();
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player") && Time.time >= nextHealTime)
