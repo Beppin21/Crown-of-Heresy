@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{b64025a6-8af1-43a7-9160-8d7d7c11c1ea}">
+		<property name="assetPath">
+			<value>Town Wind.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>110.06399999999999</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{827a3eb6-1202-49a3-afc1-b03c493639c5}</destination>
+		</relationship>
+	</object>
+</objects>
