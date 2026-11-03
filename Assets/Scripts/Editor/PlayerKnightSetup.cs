@@ -27,7 +27,8 @@ public static class PlayerKnightSetup
     private const string ControllerPath = AnimationsFolder + "/PlayerKnight.controller";
     private const string UpperBodyMaskPath = AnimationsFolder + "/UpperBody.mask";
     private const string NoFrictionPath = "Assets/Materials/PlayerSinFriccion.physicMaterial";
-    private const string DefaultWeaponPath = "Assets/Prefabs/Weapons/Knight Sword.asset"; // arma inicial (WeaponSO)
+    private const string BarFontPath = "Assets/fonts/BECKETT.asset"; // fuente del número de la barra de vida
+    private const string DefaultWeaponPath ="Assets/Prefabs/Weapons/Knight Sword.asset"; // arma inicial (WeaponSO)
     // Otras armas iniciales (WeaponSO): una más liviana y otra más pesada que la inicial
     private static readonly string[] StartingWeaponPaths =
         { "Assets/Prefabs/Weapons/Basic Sword.asset", "Assets/Prefabs/Weapons/Heavy Sword.asset" };
@@ -610,7 +611,10 @@ public static class PlayerKnightSetup
             capsule.sharedMaterial = GetNoFrictionMaterial();
 
             // --- Scripts del jugador ---
-            player.AddComponent<PlayerStats>();
+            PlayerStats stats = player.AddComponent<PlayerStats>();
+            SerializedObject statsSo = new SerializedObject(stats);
+            statsSo.FindProperty("barFont").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(BarFontPath);
+            statsSo.ApplyModifiedPropertiesWithoutUndo();
             PlayerCombat combat = player.AddComponent<PlayerCombat>();
             PlayerInteraction interaction = player.AddComponent<PlayerInteraction>();
             InventoryUI inventory = player.AddComponent<InventoryUI>();

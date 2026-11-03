@@ -80,7 +80,26 @@ public class PlayerCombat : MonoBehaviour
     private static int activeSlot;
     private static bool startingWeaponsGiven; // las armas iniciales se dan una sola vez por partida
 
-    private readonly HashSet<Collider> enemiesHitThisSwing = new HashSet<Collider>();
+    private readonly HashSet<IDamageable> enemiesHitThisSwing = new HashSet<IDamageable>();
+
+    [Header("Detección del golpe")]
+    [Tooltip("Desde qué parte de la animación (0..1) el golpe puede conectar.")]
+    [SerializeField] [Range(0f, 1f)] private float swingWindowStart = 0.1f;
+    [Tooltip("Hasta qué parte de la animación (0..1) el golpe puede conectar.")]
+    [SerializeField] [Range(0f, 1f)] private float swingWindowEnd = 0.85f;
+    [Tooltip("Velocidad mínima de la hoja (m/s) para que el golpe cuente: así pega cuando la espada corta, " +
+             "no cuando se acomoda. La consola muestra la velocidad máxima de cada golpe para ajustarla.")]
+    [SerializeField] private float minBladeSpeed = 2.5f;
+
+    private const int SweepSteps = 4;
+    private readonly Collider[] overlapBuffer = new Collider[16];
+    private bool swingActive;
+    private float swingStartTime;
+    private float swingEndTime;
+    private bool hasLastBladePose;
+    private Vector3 lastBladeCenter;
+    private Quaternion lastBladeRotation;
+    private float maxBladeSpeed;
 
     [Header("Bloqueo (defenderse con la misma espada)")]
     [SerializeField] private float parryWindowDuration = 0.3f;
@@ -236,19 +255,29 @@ public class PlayerCombat : MonoBehaviour
         animator.SetTrigger(attack.animationTrigger);
         nextComboBuffered = false;
 
-        float hitboxDelay = duration * 0.4f;
-        yield return new WaitForSeconds(hitboxDelay);
-
-        // Prendemos el Collider del hitbox real durante la ventana activa del golpe. Mientras
-        // esté prendido, cualquier OnTriggerEnter que dispare WeaponHitbox nos llega a
-        // HandleHitboxHit a través del evento OnHit
+        // Ventana del golpe: dentro de esta parte de la animación, la espada pega solo mientras la
+        // hoja se mueve rápido (lo revisa FixedUpdate). Así cada animación conecta en su momento
+        // justo, y como la ventana es proporcional a la duración, se acomoda sola al peso del arma.
         activeAttack = attack;
-        if (activeHitbox != null) activeHitbox.SetHitboxEnabled(true);
+        float windowStart = duration * swingWindowStart;
+        float windowLength = duration * (swingWindowEnd - swingWindowStart);
+        swingStartTime = Time.time + windowStart;
+        swingEndTime = swingStartTime + windowLength;
+        hasLastBladePose = false;
+        maxBladeSpeed = 0f;
+        swingActive = true;
 
-        float activeWindow = duration - hitboxDelay;
-        yield return new WaitForSeconds(activeWindow);
+        // Con un hitbox que no es una caja, se usa el trigger de siempre durante toda la ventana
+        bool useTrigger = activeHitbox != null && activeHitbox.GetComponent<BoxCollider>() == null;
+        yield return new WaitForSeconds(windowStart);
+        if (useTrigger) activeHitbox.SetHitboxEnabled(true);
+        yield return new WaitForSeconds(windowLength);
+        if (useTrigger) activeHitbox.SetHitboxEnabled(false);
+        yield return new WaitForSeconds(duration - windowStart - windowLength);
 
-        if (activeHitbox != null) activeHitbox.SetHitboxEnabled(false);
+        swingActive = false;
+        if (!useTrigger)
+            Log($"Velocidad máxima de la hoja: {maxBladeSpeed:F1} m/s (pega desde {minBladeSpeed:F1} m/s).");
         lastAttackEndTime = Time.time;
 
         if (nextComboBuffered && !isHeavy)
@@ -266,28 +295,72 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    // Se ejecuta cada vez que WeaponHitbox detecta un OnTriggerEnter mientras el hitbox está
-    // prendido. Acá SÍ se decide cuánto daño hacer y a quién -esa parte le corresponde a
-    // PlayerCombat, no al hitbox-.
+    // Durante la ventana del golpe, revisa en cada paso de física qué toca la caja del hitbox.
+    // Solo cuenta si la hoja se mueve al menos a minBladeSpeed (cuando corta de verdad, no cuando
+    // se acomoda). La caja se prueba en varias posiciones entre el paso anterior y este, así un
+    // corte rápido no "atraviesa" al enemigo sin tocarlo.
+    private void FixedUpdate()
+    {
+        if (!swingActive) return;
+        if (playerController != null && playerController.CurrentState != PlayerState.Attacking)
+        {
+            swingActive = false; // el ataque se cortó (muerte, tambaleo...)
+            return;
+        }
+
+        BoxCollider box = activeHitbox != null ? activeHitbox.GetComponent<BoxCollider>() : null;
+        if (box == null) return;
+
+        Transform boxTransform = box.transform;
+        Vector3 center = boxTransform.TransformPoint(box.center);
+        Quaternion rotation = boxTransform.rotation;
+        Vector3 scale = boxTransform.lossyScale;
+        Vector3 halfExtents = Vector3.Scale(box.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) * 0.5f;
+
+        float now = Time.time;
+        if (hasLastBladePose && now >= swingStartTime && now <= swingEndTime)
+        {
+            float bladeSpeed = Vector3.Distance(center, lastBladeCenter) / Time.fixedDeltaTime;
+            maxBladeSpeed = Mathf.Max(maxBladeSpeed, bladeSpeed);
+            if (bladeSpeed >= minBladeSpeed)
+            {
+                for (int step = 1; step <= SweepSteps; step++)
+                {
+                    float k = step / (float)SweepSteps;
+                    int count = Physics.OverlapBoxNonAlloc(Vector3.Lerp(lastBladeCenter, center, k), halfExtents, overlapBuffer,
+                                                           Quaternion.Slerp(lastBladeRotation, rotation, k), hittableLayers,
+                                                           QueryTriggerInteraction.Ignore);
+                    for (int i = 0; i < count; i++)
+                        HandleHitboxHit(overlapBuffer[i]);
+                }
+            }
+        }
+
+        lastBladeCenter = center;
+        lastBladeRotation = rotation;
+        hasLastBladePose = true;
+    }
+
+    // Se ejecuta cuando el golpe toca algo (por la revisión de FixedUpdate o, con un hitbox que no
+    // es una caja, por el OnTriggerEnter de WeaponHitbox). Acá SÍ se decide cuánto daño hacer y
+    // a quién -esa parte le corresponde a PlayerCombat, no al hitbox-.
     private void HandleHitboxHit(Collider other)
     {
         // Filtro extra por capa física (además de lo que ya filtra la matriz de colisiones de
         // Unity en Project Settings > Physics): así el arma no puede golpear, por ejemplo, al
         // propio jugador o a un prop cualquiera aunque comparta el mismo trigger por error.
         if (((1 << other.gameObject.layer) & hittableLayers) == 0) return;
+        if (other.transform.IsChildOf(transform) || other.CompareTag("Player")) return; // nunca al propio jugador
 
-        if (enemiesHitThisSwing.Contains(other)) return; // ya golpeado en este mismo swing: se ignora
-        enemiesHitThisSwing.Add(other);
+        // El enemigo puede tener varios colliders: se busca el script que recibe daño en él o en sus padres
+        IDamageable damageable = other.GetComponentInParent<IDamageable>();
+        if (damageable == null) return;
+        if (!enemiesHitThisSwing.Add(damageable)) return; // ya golpeado en este mismo swing: se ignora
 
         float finalDamage = WeaponDamage * activeAttack.damageMultiplier;
-
-
-        IDamageable damageable = other.GetComponent<IDamageable>();
-        if (damageable == null) return;
-
         damageable.TakeDamage(finalDamage);
         stats.TriggerRally(finalDamage); // "Adrenalina": golpear rápido devuelve parte de la vida perdida hace poco
-        Log($"Le pegó a '{other.name}': {finalDamage:F1} de daño.");
+        Log($"Le pegó a '{((Component)damageable).name}': {finalDamage:F1} de daño.");
     }
 
     // ---------------------------------------------------------------

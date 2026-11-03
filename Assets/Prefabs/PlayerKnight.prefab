@@ -553,6 +553,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   maxHealth: 100
   healthText: {fileID: 0}
+  useHealthBar: 1
+  barFont: {fileID: 11400000, guid: 2643c23e2499a1047b49da81b57bc614, type: 2}
   maxEstusCharges: 3
   estusHealAmount: 40
   rallyWindowDuration: 4
@@ -2931,7 +2933,7 @@ MonoBehaviour:
   swingStiffness: 30
   swingDamping: 4
   maxSwing: 35
-  lightIntensity: 2.2
+  lightIntensity: 3
   raisedLightBoost: 1.35
   flicker: 0.12
   sputterInterval: {x: 6, y: 15}
@@ -3301,8 +3303,8 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 0.72, b: 0.42, a: 1}
-  m_Intensity: 2.2
-  m_Range: 9
+  m_Intensity: 3
+  m_Range: 15
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}

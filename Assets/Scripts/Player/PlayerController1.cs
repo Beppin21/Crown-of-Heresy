@@ -63,6 +63,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float iFrameEnd = 0.35f;  
     [SerializeField] private float rollStaminaCost = 20f;
 
+    [Header("Correr")]
+    [Tooltip("Si se queda sin estamina corriendo, no puede volver a correr hasta recuperar esta cantidad " +
+             "(así no arranca y frena a cada rato mientras se regenera).")]
+    [SerializeField] private float sprintRecoverStamina = 25f;
+    private bool sprintExhausted;
+
     [Header("Lock-On")]
     [SerializeField] private float lockOnRadius = 15f;
     [SerializeField] private LayerMask enemyLayer;
@@ -237,7 +243,13 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
         // Otros scripts pueden frenar al personaje (ej.: la lámpara alzada camina más lento y no corre)
         Vector2 input = moveInput * MoveSpeedMultiplier;
-        bool running = isRunning && AllowRunning;
+
+        // Sin estamina no se corre: al llegar a 0 pasa a caminar hasta recuperar sprintRecoverStamina
+        if (stats.CurrentStamina <= 0f)
+            sprintExhausted = true;
+        else if (sprintExhausted && stats.CurrentStamina >= sprintRecoverStamina)
+            sprintExhausted = false;
+        bool running = isRunning && AllowRunning && !sprintExhausted;
 
         // El input no pasa de 0 a 1 de golpe: acelera y frena de a poco (tiempos distintos)
         float smoothTime = input.sqrMagnitude >= smoothedInput.sqrMagnitude ? accelerationTime : decelerationTime;
