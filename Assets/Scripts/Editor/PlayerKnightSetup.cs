@@ -693,6 +693,14 @@ public static class PlayerKnightSetup
             cameraObject.transform.localPosition = new Vector3(0f, height, -3f);
             cameraObject.transform.localRotation = Quaternion.identity;
 
+            // Dos listeners: el de Unity (pasos, fuegos) y el de FMOD (sonido ambiente de Ariel).
+            // El de FMOD se busca por nombre para que la herramienta compile aunque FMOD no esté.
+            if (cameraObject.GetComponent<AudioListener>() == null)
+                cameraObject.AddComponent<AudioListener>();
+            System.Type fmodListener = System.Type.GetType("FMODUnity.StudioListener, FMODUnity");
+            if (fmodListener != null && cameraObject.GetComponent(fmodListener) == null)
+                cameraObject.AddComponent(fmodListener);
+
             ThirdPersonCamera orbit = cameraObject.GetComponent<ThirdPersonCamera>();
             // Estilo Silent Hill 2 (sobre el hombro). Para el estilo souls: clic derecho sobre el
             // componente Camera > "Preset: Souls".
