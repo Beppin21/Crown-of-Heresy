@@ -112,8 +112,8 @@ public static class LanternSetup
         Light light = lightObject.AddComponent<Light>();
         light.type = LightType.Point;
         light.color = new Color(1f, 0.72f, 0.42f);
-        light.range = 9f;
-        light.intensity = 2.2f;
+        light.range = 15f;
+        light.intensity = 3f;
         light.shadows = LightShadows.Soft;
         light.shadowNearPlane = 0.1f;
 

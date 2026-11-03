@@ -37,10 +37,11 @@ public static class TownAtmosphereSetup
     private const string SparkMaterialPath = VfxFolder + "/Chispa.mat";
     private const string ProfilePath = "Assets/Settings/TownNightProfile.asset";
 
+    private const string NightSkyPath = "Assets/Settings/TownNightSky.mat";
     private const string AtmosphereRootName = "Ambiente_Noche";
     private const string FireRootName = "Incendio";
 
-    private static readonly Color FogColor = new Color(0.10f, 0.11f, 0.13f);
+    private static readonly Color FogColor = new Color(0.14f, 0.16f, 0.2f);
 
     // ---------------------------------------------------------------
     // AMBIENTACIÓN NOCTURNA
@@ -66,7 +67,14 @@ public static class TownAtmosphereSetup
 
         GameObject root = new GameObject(AtmosphereRootName);
         Undo.RegisterCreatedObjectUndo(root, "Ambientación nocturna");
-        root.AddComponent<NightAtmosphere>();
+        NightAtmosphere atmosphere = root.AddComponent<NightAtmosphere>();
+        if (RenderSettings.skybox != null)
+        {
+            // Hay cielo nocturno: la cámara lo muestra en vez de pintar el fondo del color de la niebla
+            SerializedObject atmosphereSo = new SerializedObject(atmosphere);
+            atmosphereSo.FindProperty("backgroundMatchesFog").boolValue = false;
+            atmosphereSo.ApplyModifiedPropertiesWithoutUndo();
+        }
         root.AddComponent<FogCulling>(); // lo que queda dentro de la niebla no se dibuja
 
         // Post-processing
@@ -112,15 +120,16 @@ public static class TownAtmosphereSetup
         // Niebla exponencial: densa cerca y se "come" todo a lo lejos
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.ExponentialSquared;
-        RenderSettings.fogDensity = 0.06f; // a ~35 m ya no se ve nada (ver FogCulling)
+        RenderSettings.fogDensity = 0.04f; // a ~55 m ya no se ve nada (ver FogCulling)
         RenderSettings.fogColor = FogColor;
 
-        // Luz ambiente oscura y fría (de arriba un poco azul, de abajo casi negra)
+        // Luz ambiente de luna: fría y tenue, pero alcanza para ver el pueblo
         RenderSettings.ambientMode = AmbientMode.Trilight;
-        RenderSettings.ambientSkyColor = new Color(0.09f, 0.11f, 0.16f);
-        RenderSettings.ambientEquatorColor = new Color(0.06f, 0.065f, 0.08f);
-        RenderSettings.ambientGroundColor = new Color(0.03f, 0.03f, 0.03f);
-        RenderSettings.skybox = null; // el fondo lo pinta NightAtmosphere del color de la niebla
+        RenderSettings.ambientSkyColor = new Color(0.21f, 0.25f, 0.35f);
+        RenderSettings.ambientEquatorColor = new Color(0.14f, 0.16f, 0.2f);
+        RenderSettings.ambientGroundColor = new Color(0.06f, 0.06f, 0.065f);
+        // Cielo nocturno: HDRI "Rogland Clear Night" de Poly Haven (CC0) con el shader Skybox/Cubemap
+        RenderSettings.skybox = AssetDatabase.LoadAssetAtPath<Material>(NightSkyPath);
         RenderSettings.reflectionIntensity = 0.25f;
 
         // Luna: la primera luz direccional; si hay más, se apagan (de noche hay una sola)
@@ -143,8 +152,8 @@ public static class TownAtmosphereSetup
         Undo.RecordObject(moon, "Ambientación nocturna");
         Undo.RecordObject(moon.transform, "Ambientación nocturna");
         moon.name = "Luna";
-        moon.color = new Color(0.55f, 0.65f, 0.85f);
-        moon.intensity = 0.3f;
+        moon.color = new Color(0.6f, 0.7f, 0.9f);
+        moon.intensity = 0.6f;
         moon.shadows = LightShadows.Soft;
         moon.shadowStrength = 0.8f;
         moon.transform.rotation = Quaternion.Euler(28f, 210f, 0f);
@@ -340,11 +349,11 @@ public static class TownAtmosphereSetup
         bloom.threshold.Override(1f);
         bloom.scatter.Override(0.7f);
 
-        // Imagen oscura, fría y apagada, con el contraste de Silent Hill
+        // Imagen fría y algo apagada, con contraste, pero sin oscurecer de más
         ColorAdjustments color = GetOverride<ColorAdjustments>(profile);
-        color.postExposure.Override(-0.2f);
-        color.contrast.Override(18f);
-        color.saturation.Override(-35f);
+        color.postExposure.Override(0.05f);
+        color.contrast.Override(14f);
+        color.saturation.Override(-28f);
         color.colorFilter.Override(new Color(0.9f, 0.95f, 1f));
 
         WhiteBalance whiteBalance = GetOverride<WhiteBalance>(profile);
@@ -352,7 +361,7 @@ public static class TownAtmosphereSetup
 
         // Bordes oscuros y grano de película
         Vignette vignette = GetOverride<Vignette>(profile);
-        vignette.intensity.Override(0.38f);
+        vignette.intensity.Override(0.34f);
         vignette.smoothness.Override(0.45f);
 
         FilmGrain grain = GetOverride<FilmGrain>(profile);
