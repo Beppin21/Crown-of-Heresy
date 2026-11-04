@@ -63,7 +63,7 @@ public class PlayerLantern : MonoBehaviour
     [SerializeField] private float maxSwing = 35f;
 
     [Header("Luz")]
-    [SerializeField] private float lightIntensity = 2.2f;
+    [SerializeField] private float lightIntensity = 3f;
     [SerializeField] private float raisedLightBoost = 1.35f;
     [Range(0f, 0.5f)] [SerializeField] private float flicker = 0.12f;
     [Tooltip("Cada cuántos segundos la llama chisporrotea y casi se apaga un instante (al azar entre estos dos valores). " +

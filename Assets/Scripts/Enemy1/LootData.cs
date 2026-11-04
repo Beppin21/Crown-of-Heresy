@@ -1,6 +1,7 @@
-using NUnit.Framework.Interfaces;
 using UnityEngine;
 
+// Ítem del juego (se compra, se vende, se junta como loot y va al inventario).
+// Las armas (WeaponSO) también son LootData.
 [CreateAssetMenu(fileName = "LootData", menuName = "Scriptable Objects/LootData")]
 public class LootData : ScriptableObject
 {
