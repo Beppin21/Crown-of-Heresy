@@ -604,11 +604,7 @@ MonoBehaviour:
     animationLength: 2.7
   comboResetTime: 1.2
   defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
-  startingWeapons:
-  - {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
-  - {fileID: 11400000, guid: 86142d8b9c7b3d047897657f5ca1a89f, type: 2}
-  - {fileID: 11400000, guid: 5e40075ebcbdfa1dd517673f673d9ea8, type: 2}
-  - {fileID: 11400000, guid: 09e1c3cd8ac8d16c6586ff4b911025ce, type: 2}
+  startingWeapons: []
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5

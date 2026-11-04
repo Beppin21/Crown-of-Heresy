@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Door
   openAngle: 90
   openSpeed: 180
+  requiredKeyName: Ancient Seal Key
 --- !u!1 &8325535864445270017
 GameObject:
   m_ObjectHideFlags: 0

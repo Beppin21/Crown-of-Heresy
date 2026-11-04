@@ -8,6 +8,9 @@ public class ShopTrigger : MonoBehaviour, IInteractable
 
     private bool isOpen = false;
 
+    // La tienda abierta ahora, para que el botón "Leave" de la ventana (ShopManager) la cierre
+    public static ShopTrigger Current { get; private set; }
+
     private void Start()
     {
         if (shopPanel != null)
@@ -16,10 +19,21 @@ public class ShopTrigger : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (!isOpen) return;
+
         // Si está abierta, podés cerrarla con Escape
-        if (isOpen && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             CloseShop();
+            return;
+        }
+
+        // Cerrar el inventario (Tab) vuelve a bloquear el mouse: mientras la tienda esté abierta,
+        // el mouse queda libre para poder hacer clic
+        if (Cursor.lockState != CursorLockMode.None)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
@@ -31,6 +45,7 @@ public class ShopTrigger : MonoBehaviour, IInteractable
     public void OpenShop()
     {
         isOpen = true;
+        Current = this;
         if (shopPanel != null) shopPanel.SetActive(true);
 
         // Libera el mouse para poder hacer clics en la tienda
@@ -41,6 +56,7 @@ public class ShopTrigger : MonoBehaviour, IInteractable
     public void CloseShop()
     {
         isOpen = false;
+        if (Current == this) Current = null;
         if (shopPanel != null) shopPanel.SetActive(false);
 
         // Bloquea el mouse de nuevo para volver a jugar

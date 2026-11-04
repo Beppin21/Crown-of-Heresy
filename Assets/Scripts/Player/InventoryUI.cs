@@ -7,18 +7,19 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
-    // Colores del inventario (los de texto van como etiquetas <color> de TextMeshPro)
-    private static readonly Color PanelColor = new Color(0.07f, 0.06f, 0.07f, 0.93f);
-    private static readonly Color BorderColor = new Color(0.6f, 0.47f, 0.24f, 0.9f);
-    private static readonly Color TitleColor = new Color(0.93f, 0.87f, 0.73f, 1f);
-    private static readonly Color GoldColor = new Color(0.91f, 0.77f, 0.42f, 1f);
-    private const string HeaderColor = "#C9A45C";
-    private const string NameColor = "#F2E6C8";
-    private const string StatsColor = "#B5AC9C";
-    private const string DescriptionColor = "#8F887B";
-    private const string LinkColor = "#E8C46A";
-    private const string InHandColor = "#86D27E";
-    private const string MutedColor = "#6F6A62";
+    // Colores del inventario (los de texto van como etiquetas <color> de TextMeshPro). La tienda
+    // (ShopManager) usa los mismos.
+    public static readonly Color PanelColor = new Color(0.07f, 0.06f, 0.07f, 0.93f);
+    public static readonly Color BorderColor = new Color(0.6f, 0.47f, 0.24f, 0.9f);
+    public static readonly Color TitleColor = new Color(0.93f, 0.87f, 0.73f, 1f);
+    public static readonly Color GoldColor = new Color(0.91f, 0.77f, 0.42f, 1f);
+    public const string HeaderColor = "#C9A45C";
+    public const string NameColor = "#F2E6C8";
+    public const string StatsColor = "#B5AC9C";
+    public const string DescriptionColor = "#8F887B";
+    public const string LinkColor = "#E8C46A";
+    public const string InHandColor = "#86D27E";
+    public const string MutedColor = "#6F6A62";
 
     [Header("Referencias de UI")]
     [SerializeField] private GameObject inventoryPanel;
@@ -84,6 +85,8 @@ public class InventoryUI : MonoBehaviour
     {
         isOpen = !isOpen;
         inventoryPanel.SetActive(isOpen);
+        if (isOpen)
+            inventoryPanel.transform.SetAsLastSibling(); // arriba de la tienda, si está abierta en el mismo Canvas
 
         // Control del cursor: si el inventario está abierto liberamos el mouse, si no lo bloqueamos
         Cursor.lockState = isOpen ? CursorLockMode.None : CursorLockMode.Locked;
