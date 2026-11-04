@@ -601,10 +601,21 @@ MonoBehaviour:
     staminaCost: 30
     animationLength: 2.7
   comboResetTime: 1.2
+<<<<<<< Updated upstream
   equippedWeapon: LongSword
+=======
+  defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
+  startingWeapons:
+  - {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
+  - {fileID: 11400000, guid: 86142d8b9c7b3d047897657f5ca1a89f, type: 2}
+  swingWindowStart: 0.1
+  swingWindowEnd: 0.85
+  minBladeSpeed: 2.5
+>>>>>>> Stashed changes
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5
+  debugLogs: 1
 --- !u!114 &7812464602763789418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -671,6 +682,7 @@ MonoBehaviour:
   iFrameStart: 0.05
   iFrameEnd: 0.35
   rollStaminaCost: 20
+  sprintRecoverStamina: 25
   lockOnRadius: 15
   enemyLayer:
     serializedVersion: 2
@@ -1511,7 +1523,6 @@ GameObject:
   m_Component:
   - component: {fileID: 607891903137593821}
   - component: {fileID: 2597002262844181907}
-  - component: {fileID: 1765321170417023043}
   - component: {fileID: 3057311025644571366}
   - component: {fileID: 9144007524735700524}
   m_Layer: 0
@@ -1587,14 +1598,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &1765321170417023043
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1730803539173389253}
-  m_Enabled: 1
 --- !u!114 &3057311025644571366
 MonoBehaviour:
   m_ObjectHideFlags: 0
