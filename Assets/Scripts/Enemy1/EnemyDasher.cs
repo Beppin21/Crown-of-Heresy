@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyDasher : MonoBehaviour, IDamageable
 {
     [Header("Invulnerabilidad")]
-    [SerializeField] private float damageCooldown = 0.3f; // Tiempo mínimo entre impactos (corto: el jugador ya no repite daño en un mismo golpe)
+    [SerializeField] private float damageCooldown = 0.15f; // Tiempo mínimo entre impactos (corto: el jugador ya no repite daño en un mismo golpe, y el Featherlight Rapier pega cada ~0.22 s)
     private float lastDamageTime = -999f;
 
     [Header("Feedback de Daño")]

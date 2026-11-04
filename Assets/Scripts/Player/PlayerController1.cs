@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float rollSpeed = 7f;
     [SerializeField] private float iFrameStart = 0.05f; 
     [SerializeField] private float iFrameEnd = 0.35f;  
-    [SerializeField] private float rollStaminaCost = 20f;
+    [SerializeField] private float rollStaminaCost = 16f;
 
     [Header("Correr")]
     [Tooltip("Si se queda sin estamina corriendo, no puede volver a correr hasta recuperar esta cantidad " +
@@ -427,12 +427,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // en el piso y que tenga estamina suficiente antes de largar la coroutine.
     private void TryRoll()
     {
-        if (isRolling || currentState == PlayerState.Attacking) return;
-        if (!IsGrounded) return; // no se rueda en el aire
-        if (!stats.HasEnoughStamina(rollStaminaCost)) return;
-
+        if (currentState == PlayerState.Attacking || !CanRoll) return;
         StartCoroutine(RollRoutine());
     }
+
+    // En el piso, sin estar rodando ya y con estamina para la rodada (no se rueda en el aire)
+    private bool CanRoll => !isRolling && IsGrounded && stats.HasEnoughStamina(rollStaminaCost);
 
 
     private IEnumerator RollRoutine()
@@ -527,13 +527,20 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         else if (context.canceled) isRunning = false;
     }
 
-    // Se llama al presionar la tecla de rodar/esquivar.
+    // Se llama al presionar la tecla de rodar/esquivar. En medio de un ataque, rodar lo corta en
+    // el acto (para esquivar al jefe sin esperar a que termine el golpe); si no se puede rodar
+    // (sin estamina), queda en el buffer para cuando termine.
     public void OnRoll(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
         if (ZoneSettings.LanternMode) return; // en modo lámpara no se rueda (se explora caminando)
 
-        if (currentState == PlayerState.Attacking || currentState == PlayerState.Blocking)
+        if (currentState == PlayerState.Attacking && CanRoll)
+        {
+            combat.CancelAttack();
+            TryRoll();
+        }
+        else if (currentState == PlayerState.Attacking || currentState == PlayerState.Blocking)
             BufferInput(TryRoll);
         else
             TryRoll();

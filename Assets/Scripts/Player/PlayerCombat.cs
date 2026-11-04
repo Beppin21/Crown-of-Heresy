@@ -54,6 +54,7 @@ public class PlayerCombat : MonoBehaviour
     private float lastAttackEndTime; // cuándo terminó el último golpe (pasado comboResetTime, el combo se corta)
     private bool nextComboBuffered;
     private bool nextComboIsHeavy;
+    private Coroutine attackRoutine; // el golpe en curso, para poder cortarlo (rodar cancela el ataque)
 
     // Guarda QUÉ ataque está activo mientras el hitbox está prendido, para que cuando WeaponHitbox
     // avise "OnHit" sepamos cuánto daño y poiseDamage corresponde aplicar.
@@ -216,11 +217,13 @@ public class PlayerCombat : MonoBehaviour
             currentComboIndex = 0; // pasó demasiado tiempo: el combo se corta y vuelve al primer golpe
 
         AttackData attack = isHeavy ? heavyAttack : GetCurrentLightAttack();
-        float finalStaminaCost = attack.staminaCost * StaminaMultiplier;
+        // Un golpe que cueste más que toda la barra (el fuerte de la Colossal Greatsword) se puede
+        // tirar igual con la barra llena, y la deja vacía
+        float finalStaminaCost = Mathf.Min(attack.staminaCost * StaminaMultiplier, stats.MaxStamina);
 
         if (!stats.HasEnoughStamina(finalStaminaCost)) return; // sin estamina no se puede ni empezar el golpe
 
-        StartCoroutine(AttackRoutine(attack, isHeavy, finalStaminaCost));
+        attackRoutine = StartCoroutine(AttackRoutine(attack, isHeavy, finalStaminaCost));
     }
 
     // Llamado desde PlayerController cuando el jugador aprieta ataque mientras la animación
@@ -229,6 +232,30 @@ public class PlayerCombat : MonoBehaviour
     {
         nextComboBuffered = true;
         nextComboIsHeavy = isHeavy;
+    }
+
+    // Corta el golpe en curso: lo llama PlayerController cuando el jugador rueda en medio de un
+    // ataque. La espada deja de pegar, el combo vuelve al primer golpe y no queda recuperación
+    // (la rodada ya tarda lo suyo). La estamina del golpe ya se gastó. La animación la corta el
+    // trigger "Roll", que entra desde Any State.
+    public void CancelAttack()
+    {
+        if (attackRoutine != null) StopCoroutine(attackRoutine);
+        attackRoutine = null;
+
+        swingActive = false;
+        if (activeHitbox != null) activeHitbox.SetHitboxEnabled(false);
+        nextComboBuffered = false;
+        currentComboIndex = 0;
+        lastAttackEndTime = Time.time;
+        nextAttackTime = Time.time;
+        foreach (AttackData attack in lightComboSequence)
+            animator.ResetTrigger(attack.animationTrigger);
+        animator.ResetTrigger(heavyAttack.animationTrigger);
+
+        if (playerController.CurrentState == PlayerState.Attacking)
+            playerController.CurrentState = PlayerState.Idle;
+        Log("Ataque cortado por la rodada.");
     }
 
     // Devuelve cuál es el próximo golpe liviano del combo, según en qué paso vamos.
@@ -289,6 +316,7 @@ public class PlayerCombat : MonoBehaviour
         }
         else
         {
+            attackRoutine = null;
             currentComboIndex = 0;
             playerController.CurrentState = PlayerState.Idle;
             nextAttackTime = Time.time + RecoveryTime; // ya se puede mover, pero todavía no volver a atacar
