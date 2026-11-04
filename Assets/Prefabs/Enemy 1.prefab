@@ -93,22 +93,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 198471059226297688}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 763a293c23290fd4d95b4f167f10579d, type: 3}
+  m_Script: {fileID: 11500000, guid: 05a42a201edf47208c3b057f176ebbb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyDasher
+  m_EditorClassIdentifier: Assembly-CSharp::BaseEnemy
   damageCooldown: 0.3
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.12
   maxHealth: 50
   lootPrefab: {fileID: 2648580526016975762, guid: c4c203bb64e30154b8b7b96ab15616fa, type: 3}
-  detectionRange: 10
+  detectionRange: 14
   shakeDuration: 0.8
   shakeIntensity: 0.15
   dashSpeed: 18
   dashDuration: 0.35
-  attackCooldown: 1
+  attackCooldown: 1.5
   rotationSpeed: 240
-  trackDuration: 3.5
+  trackDuration: 1.5
   visualTransform: {fileID: 1016049323446719543}
   hitboxObject: {fileID: 7350641015681467816}
 --- !u!1 &2845133906902491648
@@ -462,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ff6c195d3719cb4b85251ffa032d224, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
-  enemyDasher: {fileID: 3577919535669499459}
+  baseEnemy: {fileID: 3577919535669499459}
   damage: 20
 --- !u!1 &8763582769130354664
 GameObject:
