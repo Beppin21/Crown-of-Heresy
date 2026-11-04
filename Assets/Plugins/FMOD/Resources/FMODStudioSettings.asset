@@ -526,8 +526,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: ../../Crown-of-Heresy/Crown-of-Heresy.fspro
-  sourceBankPath: ../../Crown-of-Heresy/Build
+  sourceProjectPath: ../../Testeosonido/Testeosonido.fspro
+  sourceBankPath: ../../Testeosonido/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
