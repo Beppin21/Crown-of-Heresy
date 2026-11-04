@@ -10,8 +10,10 @@ using UnityEngine;
 //   - Al rodar, la espada vuelve a la cintura al instante (SheatheInstant): el próximo ataque
 //     vuelve a desenvainar.
 //
-// La espada es un solo objeto que se "cuelga" de la mano (SwordGrip) o de la cintura
-// (SwordHipSocket). Para acomodar cómo queda en la cintura, se mueve/rota SwordHipSocket.
+// Lo que se "cuelga" de la mano (SwordGrip) o de la cintura (SwordHipSocket) es un soporte,
+// "WeaponHolder", que se crea al arrancar con la espada del personaje adentro. El arma equipada
+// puede cambiar el modelo que va en el soporte (SetWeaponModel, lo llama PlayerCombat).
+// Para acomodar cómo queda en la cintura, se mueve/rota SwordHipSocket.
 //
 // Las animaciones de desenvainar/envainar van en la capa "UpperBody" del Animator (solo torso,
 // brazos y cabeza), así el personaje puede seguir caminando mientras desenvaina.
@@ -21,8 +23,12 @@ public class PlayerWeaponSheath : MonoBehaviour
     private static readonly int SheatheTrigger = Animator.StringToHash("Sheathe");
     private const string UpperBodyLayer = "UpperBody";
 
+    // Giro del soporte respecto de la espada del Knight, que apunta hacia -Z: así, adentro del
+    // soporte, +Y apunta hacia la punta. Los prefabs de armas se arman con esos ejes (ver WeaponSO).
+    private static readonly Quaternion HolderFrame = Quaternion.Euler(-90f, 0f, 0f);
+
     [Header("Espada")]
-    [Tooltip("El modelo de la espada. Si se deja vacío, se busca dentro de SwordGrip.")]
+    [Tooltip("La espada que trae el personaje. Si se deja vacío, se busca dentro de SwordGrip.")]
     [SerializeField] private Transform sword;
     [Tooltip("Punto de la mano donde se sostiene la espada (SwordGrip).")]
     [SerializeField] private Transform handGrip;
@@ -52,8 +58,11 @@ public class PlayerWeaponSheath : MonoBehaviour
 
     private Animator animator;
     private PlayerController controller;
+    private Transform holder;              // soporte que va de la mano a la cintura, con el modelo del arma adentro
+    private GameObject customModel;        // modelo del arma equipada (null = la espada del personaje)
     private Renderer[] swordRenderers = new Renderer[0];
-    private Vector3 handLocalPosition;     // cómo está ubicada la espada dentro de SwordGrip
+    private bool swordVisible = true;
+    private Vector3 handLocalPosition;     // cómo está ubicado el soporte dentro de SwordGrip
     private Quaternion handLocalRotation;
     private Vector3 handLocalScale;
     private Vector3 swordWorldScale;       // para que no cambie de tamaño al pasar a la cintura
@@ -80,11 +89,12 @@ public class PlayerWeaponSheath : MonoBehaviour
 
         if (sword != null)
         {
+            CreateHolder();
             swordRenderers = sword.GetComponentsInChildren<Renderer>(true);
-            handLocalPosition = sword.localPosition;
-            handLocalRotation = sword.localRotation;
-            handLocalScale = sword.localScale;
-            swordWorldScale = sword.lossyScale;
+            handLocalPosition = holder.localPosition;
+            handLocalRotation = holder.localRotation;
+            handLocalScale = holder.localScale;
+            swordWorldScale = holder.lossyScale;
         }
         else
         {
@@ -210,25 +220,26 @@ public class PlayerWeaponSheath : MonoBehaviour
     // Cuelga la espada de la mano o de la cintura. Sin punto en la cintura, la espada guardada se oculta.
     private void PutSwordInHand(bool inHand)
     {
-        if (sword == null) return;
+        if (holder == null) return;
 
         if (inHand && handGrip != null)
         {
-            sword.SetParent(handGrip, false);
-            sword.localPosition = handLocalPosition;
-            sword.localRotation = handLocalRotation;
-            sword.localScale = handLocalScale;
+            holder.SetParent(handGrip, false);
+            holder.localPosition = handLocalPosition;
+            holder.localRotation = handLocalRotation;
+            holder.localScale = handLocalScale;
             SetSwordVisible(true);
         }
         else if (!inHand && hipSocket != null)
         {
-            sword.SetParent(hipSocket, false);
-            sword.localPosition = Vector3.zero;
-            sword.localRotation = Quaternion.identity;
+            // Con este giro la espada del personaje queda igual que antes respecto de SwordHipSocket
+            holder.SetParent(hipSocket, false);
+            holder.localPosition = Vector3.zero;
+            holder.localRotation = HolderFrame;
             Vector3 socketScale = hipSocket.lossyScale;
-            sword.localScale = new Vector3(swordWorldScale.x / socketScale.x,
-                                           swordWorldScale.y / socketScale.y,
-                                           swordWorldScale.z / socketScale.z);
+            holder.localScale = new Vector3(swordWorldScale.x / socketScale.x,
+                                            swordWorldScale.y / socketScale.y,
+                                            swordWorldScale.z / socketScale.z);
             SetSwordVisible(true);
         }
         else
@@ -240,10 +251,73 @@ public class PlayerWeaponSheath : MonoBehaviour
     // Se apagan solo los Renderers (no el GameObject) para que el hitbox siga inicializado
     private void SetSwordVisible(bool visible)
     {
+        swordVisible = visible;
         foreach (Renderer r in swordRenderers)
         {
             if (r != null) r.enabled = visible;
         }
+    }
+
+    // ---------------------------------------------------------------
+    // MODELO DEL ARMA
+    // ---------------------------------------------------------------
+
+    // Arma el soporte en la mano, en el mismo lugar que la espada pero con escala 1 en el mundo
+    // (los huesos del Knight están escalados unas 60 veces): así un prefab de arma instanciado
+    // adentro conserva su tamaño real. La espada del personaje pasa a ser hija del soporte, sin moverse.
+    private void CreateHolder()
+    {
+        Transform parent = sword.parent;
+        Vector3 parentScale = parent != null ? parent.lossyScale : Vector3.one;
+
+        holder = new GameObject("WeaponHolder").transform;
+        holder.gameObject.layer = sword.gameObject.layer;
+        holder.SetParent(parent, false);
+        holder.localPosition = sword.localPosition;
+        holder.localRotation = sword.localRotation * HolderFrame;
+        holder.localScale = Vector3.one * (3f / (parentScale.x + parentScale.y + parentScale.z));
+        sword.SetParent(holder, true);
+    }
+
+    // Cambia el modelo del arma que se ve (en la mano o en la cintura). Con null vuelve a la espada
+    // que trae el personaje. El prefab se instancia adentro del soporte con su propia posición,
+    // rotación y escala. Devuelve el modelo que quedó a la vista (lo usa PlayerCombat para el hitbox).
+    public GameObject SetWeaponModel(GameObject modelPrefab)
+    {
+        if (holder == null)
+        {
+            Debug.LogWarning("[PlayerWeaponSheath] No hay espada en SwordGrip: no se puede cambiar el modelo del arma.", this);
+            return null;
+        }
+
+        if (customModel != null)
+        {
+            customModel.SetActive(false);
+            Destroy(customModel);
+            customModel = null;
+        }
+
+        if (modelPrefab != null)
+        {
+            customModel = Instantiate(modelPrefab, holder, false);
+            SetLayerRecursively(customModel.transform, holder.gameObject.layer);
+        }
+
+        // La espada del personaje (con su hitbox) se apaga mientras haya otro modelo
+        sword.gameObject.SetActive(customModel == null);
+
+        GameObject visibleModel = customModel != null ? customModel : sword.gameObject;
+        swordRenderers = visibleModel.GetComponentsInChildren<Renderer>(true);
+        SetSwordVisible(swordVisible);
+        Log($"Modelo del arma: '{visibleModel.name}'.");
+        return visibleModel;
+    }
+
+    private static void SetLayerRecursively(Transform target, int layer)
+    {
+        target.gameObject.layer = layer;
+        foreach (Transform child in target)
+            SetLayerRecursively(child, layer);
     }
 
     private static Transform FindDeep(Transform parent, string name)

@@ -8,7 +8,8 @@ using UnityEngine.Rendering.Universal;
 //   - se prende el post-processing (bloom del fuego, viñeta, grano, colores fríos).
 public class NightAtmosphere : MonoBehaviour
 {
-    [Tooltip("Tildado: el fondo de la cámara usa el color de la niebla (Lighting > Environment > Fog).")]
+    [Tooltip("Tildado: el fondo de la cámara usa el color de la niebla (Lighting > Environment > Fog). " +
+             "Destildado: se ve el cielo (Lighting > Environment > Skybox Material), como en Town.")]
     [SerializeField] private bool backgroundMatchesFog = true;
     [SerializeField] private bool enablePostProcessing = true;
 

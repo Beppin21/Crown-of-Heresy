@@ -553,6 +553,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   maxHealth: 100
   healthText: {fileID: 0}
+  useHealthBar: 1
+  barFont: {fileID: 11400000, guid: 2643c23e2499a1047b49da81b57bc614, type: 2}
   maxEstusCharges: 3
   estusHealAmount: 40
   rallyWindowDuration: 4
@@ -580,28 +582,31 @@ MonoBehaviour:
     m_Bits: 4294967295
   lightComboSequence:
   - animationTrigger: Attack_Light_1
-    damage: 12
+    damageMultiplier: 1
     poiseDamage: 8
     staminaCost: 12
     animationLength: 2.16
   - animationTrigger: Attack_Light_2
-    damage: 14
+    damageMultiplier: 1.17
     poiseDamage: 10
     staminaCost: 14
     animationLength: 2.3400002
   - animationTrigger: Attack_Light_3
-    damage: 20
+    damageMultiplier: 1.67
     poiseDamage: 15
     staminaCost: 18
     animationLength: 1.8
   heavyAttack:
     animationTrigger: Attack_Heavy
-    damage: 35
+    damageMultiplier: 2.92
     poiseDamage: 30
     staminaCost: 30
     animationLength: 2.7
   comboResetTime: 1.2
-  equippedWeapon: LongSword
+  defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
+  startingWeapons:
+  - {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
+  - {fileID: 11400000, guid: 86142d8b9c7b3d047897657f5ca1a89f, type: 2}
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5
@@ -1511,6 +1516,7 @@ GameObject:
   m_Component:
   - component: {fileID: 607891903137593821}
   - component: {fileID: 2597002262844181907}
+  - component: {fileID: 1765321170417023043}
   - component: {fileID: 3057311025644571366}
   - component: {fileID: 9144007524735700524}
   - component: {fileID: 5285460478207150533}
@@ -1587,6 +1593,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &1765321170417023043
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730803539173389253}
+  m_Enabled: 1
 --- !u!114 &3057311025644571366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2934,7 +2948,7 @@ MonoBehaviour:
   swingStiffness: 30
   swingDamping: 4
   maxSwing: 35
-  lightIntensity: 2.2
+  lightIntensity: 3
   raisedLightBoost: 1.35
   flicker: 0.12
   sputterInterval: {x: 6, y: 15}
@@ -3304,8 +3318,8 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 0.72, b: 0.42, a: 1}
-  m_Intensity: 2.2
-  m_Range: 9
+  m_Intensity: 3
+  m_Range: 15
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}

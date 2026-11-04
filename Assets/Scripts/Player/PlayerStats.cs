@@ -16,7 +16,14 @@ public class PlayerStats : MonoBehaviour, IDamageable
     private float currentHealth;
 
     [Header("UI de Vida")]
+    [Tooltip("Texto de vida del Canvas. Al arrancar se arman en su lugar las barras de vida y de " +
+             "estamina (StatBarUI) y el texto queda adentro de la de vida.")]
     [SerializeField] private TextMeshProUGUI healthText;
+    [SerializeField] private bool useHealthBar = true;
+    [Tooltip("Fuente del número de vida adentro de la barra (vacío = la del texto original).")]
+    [SerializeField] private TMP_FontAsset barFont;
+    private StatBarUI healthBar;
+    private StatBarUI staminaBar;
 
     [Header("Botiquín (curación limitada: cargas finitas, típico de survival horror)")]
     [SerializeField] private int maxEstusCharges = 3;
@@ -95,13 +102,23 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     private void Start()
     {
+        if (useHealthBar && healthText != null)
+        {
+            healthBar = StatBarUI.CreateHealthBar(healthText, barFont);
+            staminaBar = StatBarUI.CreateStaminaBar(healthBar);
+            OnStaminaChanged += staminaBar.SetValue; // la barra de estamina se actualiza sola con cada cambio
+            staminaBar.SetValue(currentStamina, maxStamina);
+        }
+
         UpdateHealthUI(currentHealth, maxHealth);
     }
 
-    // Muestra la vida en el texto de la UI (si hay uno asignado).
+    // Muestra la vida en la barra (o en el texto de la UI, si las barras están apagadas).
     private void UpdateHealthUI(float current, float max)
     {
-        if (healthText != null)
+        if (healthBar != null)
+            healthBar.SetValue(current, max);
+        else if (healthText != null)
             healthText.text = $"HP: {Mathf.CeilToInt(current)} / {max}";
     }
 

@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyDasher : MonoBehaviour, IDamageable
 {
     [Header("Invulnerabilidad")]
-    [SerializeField] private float damageCooldown = 1.5f; // Tiempo mínimo entre impactos
+    [SerializeField] private float damageCooldown = 0.3f; // Tiempo mínimo entre impactos (corto: el jugador ya no repite daño en un mismo golpe)
     private float lastDamageTime = -999f;
 
     [Header("Feedback de Daño")]
@@ -40,6 +40,14 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     private Transform player;
     private Rigidbody rb;
     private bool isAttacking = false;
+
+    [Header("Ataque 2 - Onda Expansiva (cíclico)")]
+    [SerializeField] private float secondAttackCooldown = 20f; // Segundos de recarga entre cada onda
+    [SerializeField] private float secondAttackChargeTime = 1.5f; // Tiempo que tarda en cargar el golpe
+    [SerializeField] private float secondAttackRange = 5f; // Radio de la onda alrededor del enemigo
+    [SerializeField] private float secondAttackDamage = 30f;
+    [SerializeField] private float secondAttackShakeIntensity = 0.1f;
+    private Coroutine secondAttackLoop;
 
     void Start()
     {
@@ -274,6 +282,71 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         }
 
         transform.rotation = targetRot;
+    }
+
+    void OnEnable()
+    {
+        // Arranca el bucle del segundo ataque sin tocar el Start original
+        secondAttackLoop = StartCoroutine(SecondAttackLoop());
+    }
+
+    private IEnumerator SecondAttackLoop()
+    {
+        while (!isDead)
+        {
+            // 1. Espera la recarga
+            yield return new WaitForSeconds(secondAttackCooldown);
+
+            // 2. Espera a que termine el dash (si lo está haciendo) y a que el jugador esté en rango
+            yield return new WaitUntil(() =>
+                isDead || (player != null && !isAttacking &&
+                Vector3.Distance(transform.position, player.position) <= detectionRange));
+
+            if (isDead) yield break;
+
+            yield return StartCoroutine(SecondAttackRoutine());
+        }
+    }
+
+    private IEnumerator SecondAttackRoutine()
+    {
+        isAttacking = true; // Bloquea el dash mientras carga la onda
+        if (rb != null) rb.linearVelocity = Vector3.zero;
+
+        // 1. Carga: tiembla cada vez más fuerte
+        Vector3 initialVisualLocalPos = visualTransform.localPosition;
+        float elapsed = 0f;
+        while (elapsed < secondAttackChargeTime)
+        {
+            float progress = elapsed / secondAttackChargeTime;
+            visualTransform.localPosition = initialVisualLocalPos + Random.insideUnitSphere * secondAttackShakeIntensity * progress;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        visualTransform.localPosition = initialVisualLocalPos;
+
+        // 2. Onda expansiva: daña al jugador si está dentro del radio
+        Collider[] hits = Physics.OverlapSphere(transform.position, secondAttackRange);
+        foreach (Collider hit in hits)
+        {
+            if (!hit.CompareTag("Player")) continue;
+
+            IDamageable playerDamageable = hit.GetComponentInParent<IDamageable>();
+            if (playerDamageable != null)
+            {
+                playerDamageable.TakeDamage(secondAttackDamage);
+                break; // Un solo golpe por onda aunque el jugador tenga varios colliders
+            }
+        }
+
+        isAttacking = false;
+    }
+
+    void OnDrawGizmos()
+    {
+        // Radio de la onda expansiva
+        Gizmos.color = new Color(1f, 0.4f, 0f);
+        Gizmos.DrawWireSphere(transform.position, secondAttackRange);
     }
 
     // Dibuja el rango en la ventana Scene para calibrarlo fácilmente

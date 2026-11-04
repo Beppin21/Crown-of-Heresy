@@ -3,12 +3,16 @@ using UnityEngine;
 // Tipo de arma (espada, hacha, daga...): define QUÉ animación de ataque se ejecuta y cómo
 // el peso de cada arma concreta de este tipo afecta la velocidad de esa animación.
 // Las armas particulares (WeaponSO) apuntan a uno de estos assets.
+//
+// La animación (attackClip) y la ventana del hitbox las usa Combat1 (el Player viejo).
+// PlayerCombat (PlayerKnight) tiene su propio combo de animaciones: del tipo usa las curvas
+// de peso (velocidad, recuperación y estamina).
 [CreateAssetMenu(fileName = "WeaponType", menuName = "Scriptable Objects/Weapon Type")]
 public class WeaponTypeSO : ScriptableObject
 {
     [SerializeField] private string typeName;
 
-    [Header("Animación")]
+    [Header("Animación (Combat1)")]
     [Tooltip("Animación de ataque propia de este tipo de arma.")]
     [SerializeField] private AnimationClip attackClip;
 
@@ -31,6 +35,12 @@ public class WeaponTypeSO : ScriptableObject
     [Tooltip("Segundos de recuperación después del ataque con un arma de peso heavyWeight (o más).")]
     [SerializeField] private float heavyRecoveryTime = 0.6f;
 
+    [Header("Peso → Estamina (PlayerCombat)")]
+    [Tooltip("Multiplicador de la estamina de cada golpe con un arma de peso lightWeight (o menos).")]
+    [SerializeField] private float lightStaminaMultiplier = 0.6f;
+    [Tooltip("Multiplicador de la estamina de cada golpe con un arma de peso heavyWeight (o más).")]
+    [SerializeField] private float heavyStaminaMultiplier = 1.6f;
+
     public string TypeName => typeName;
     public AnimationClip AttackClip => attackClip;
     public float HitboxStart => hitboxStart;
@@ -48,5 +58,12 @@ public class WeaponTypeSO : ScriptableObject
     {
         float t = Mathf.InverseLerp(lightWeight, heavyWeight, weight);
         return Mathf.Lerp(lightRecoveryTime, heavyRecoveryTime, t);
+    }
+
+    // Cuanto más pesada el arma, más estamina gasta cada golpe
+    public float GetStaminaMultiplier(float weight)
+    {
+        float t = Mathf.InverseLerp(lightWeight, heavyWeight, weight);
+        return Mathf.Lerp(lightStaminaMultiplier, heavyStaminaMultiplier, t);
     }
 }

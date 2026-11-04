@@ -15,18 +15,18 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.1, g: 0.11, b: 0.13, a: 1}
+  m_FogColor: {r: 0.14, g: 0.16, b: 0.2, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.06
+  m_FogDensity: 0.04
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.09, g: 0.11, b: 0.16, a: 1}
-  m_AmbientEquatorColor: {r: 0.06, g: 0.065, b: 0.08, a: 1}
-  m_AmbientGroundColor: {r: 0.03, g: 0.03, b: 0.03, a: 1}
+  m_AmbientSkyColor: {r: 0.21, g: 0.25, b: 0.35, a: 1}
+  m_AmbientEquatorColor: {r: 0.14, g: 0.16, b: 0.2, a: 1}
+  m_AmbientGroundColor: {r: 0.06, g: 0.06, b: 0.065, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: cdf3efed4de22de1661a55625b3281e3, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -6876,7 +6876,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 0.5430124, b: 0, a: 1}
   m_Intensity: 10000
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -12952,8 +12952,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
-  m_Color: {r: 0.55, g: 0.65, b: 0.85, a: 1}
-  m_Intensity: 0.3
+  m_Color: {r: 0.6, g: 0.7, b: 0.9, a: 1}
+  m_Intensity: 0.6
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -13954,7 +13954,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 0.41291898, b: 0, a: 1}
   m_Intensity: 1000
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -20591,7 +20591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60a8a4ff3c62a0e4c86d3586f0926216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightAtmosphere
-  backgroundMatchesFog: 1
+  backgroundMatchesFog: 0
   enablePostProcessing: 1
 --- !u!4 &752957221
 Transform:
@@ -20676,23 +20676,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.60255235
+      value: -0.5443604
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.030859238
+      value: -0.027878994
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.79643875
+      value: -0.83729076
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.04078898
-      objectReference: {fileID: 0}
-    - target: {fileID: 1765321170417023043, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
-      propertyPath: m_Enabled
-      value: 0
+      value: 0.04288119
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20708,19 +20704,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.60255235
+      value: -0.5443604
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.03085924
+      value: -0.027878989
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.79643875
+      value: -0.83729076
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.040788975
+      value: 0.042881187
       objectReference: {fileID: 0}
     - target: {fileID: 2597002262844181907, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: near clip plane
@@ -27640,8 +27636,8 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.8867924, g: 0.41437674, b: 0.012548926, a: 1}
-  m_Intensity: 1.5
-  m_Range: 10
+  m_Intensity: 3
+  m_Range: 16
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -27753,7 +27749,7 @@ Light:
   m_Type: 2
   m_Color: {r: 0.8679245, g: 0.47185087, b: 0, a: 1}
   m_Intensity: 1000
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -35968,7 +35964,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1893706984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37793,7 +37789,7 @@ MonoBehaviour:
   Preload: 0
   NonRigidbodyVelocity: 0
   Params: []
-  OverrideAttenuation: 0
+  OverrideAttenuation: 1
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
 --- !u!4 &2065040801

@@ -27,6 +27,11 @@ public static class PlayerKnightSetup
     private const string ControllerPath = AnimationsFolder + "/PlayerKnight.controller";
     private const string UpperBodyMaskPath = AnimationsFolder + "/UpperBody.mask";
     private const string NoFrictionPath = "Assets/Materials/PlayerSinFriccion.physicMaterial";
+    private const string BarFontPath = "Assets/fonts/BECKETT.asset"; // fuente del número de la barra de vida
+    private const string DefaultWeaponPath ="Assets/Prefabs/Weapons/Knight Sword.asset"; // arma inicial (WeaponSO)
+    // Otras armas iniciales (WeaponSO): una más liviana y otra más pesada que la inicial
+    private static readonly string[] StartingWeaponPaths =
+        { "Assets/Prefabs/Weapons/Basic Sword.asset", "Assets/Prefabs/Weapons/Heavy Sword.asset" };
 
     private const string KnightChildName = "KnightModel";
     private const string CameraTargetName = "CameraTarget";
@@ -196,6 +201,14 @@ public static class PlayerKnightSetup
                                            "ParrySuccess", "BlockImpact", "GuardBreak", "Draw", "Sheathe" })
             controller.AddParameter(trigger, AnimatorControllerParameterType.Trigger);
 
+        // Velocidad de los ataques según el peso del arma equipada (la setea PlayerCombat)
+        controller.AddParameter(new AnimatorControllerParameter
+        {
+            name = "AttackSpeed",
+            type = AnimatorControllerParameterType.Float,
+            defaultFloat = 1f,
+        });
+
         AnimatorStateMachine sm = controller.layers[0].stateMachine;
 
         // Locomoción: dos sets de animaciones mezclados según "Armed" (0 = espada guardada, 1 = en la mano)
@@ -259,6 +272,11 @@ public static class PlayerKnightSetup
         AnimatorState light2 = AddState(sm, "Attack_Light_2", attack2);
         AnimatorState light3 = AddState(sm, "Attack_Light_3", attack3);
         AnimatorState heavyState = AddState(sm, "Attack_Heavy", heavy);
+        foreach (AnimatorState attack in new[] { light1, light2, light3, heavyState })
+        {
+            attack.speedParameter = "AttackSpeed";
+            attack.speedParameterActive = true;
+        }
         AnimatorState blockIdle = AddState(sm, "Block_Idle", block);
         AnimatorState blockHit = AddState(sm, "Block_Hit", LoadClip(BlockHitPath));
         AnimatorState stagger = AddState(sm, "Stagger", staggerClip);
@@ -593,7 +611,10 @@ public static class PlayerKnightSetup
             capsule.sharedMaterial = GetNoFrictionMaterial();
 
             // --- Scripts del jugador ---
-            player.AddComponent<PlayerStats>();
+            PlayerStats stats = player.AddComponent<PlayerStats>();
+            SerializedObject statsSo = new SerializedObject(stats);
+            statsSo.FindProperty("barFont").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(BarFontPath);
+            statsSo.ApplyModifiedPropertiesWithoutUndo();
             PlayerCombat combat = player.AddComponent<PlayerCombat>();
             PlayerInteraction interaction = player.AddComponent<PlayerInteraction>();
             InventoryUI inventory = player.AddComponent<InventoryUI>();
@@ -626,10 +647,18 @@ public static class PlayerKnightSetup
                 }
             }
 
-            // PlayerCombat: hitbox, capas y duración real de cada animación de ataque
+            // PlayerCombat: hitbox, capas, armas y duración real de cada animación de ataque
             SerializedObject combatSo = new SerializedObject(combat);
             combatSo.FindProperty("weaponHitbox").objectReferenceValue = hitbox;
             combatSo.FindProperty("hittableLayers").intValue = hittableLayers;
+            WeaponSO defaultWeapon = AssetDatabase.LoadAssetAtPath<WeaponSO>(DefaultWeaponPath);
+            if (defaultWeapon == null)
+                Debug.LogWarning($"[PlayerKnightSetup] No se encontró el arma inicial en '{DefaultWeaponPath}': asignala a mano en PlayerCombat.");
+            combatSo.FindProperty("defaultWeapon").objectReferenceValue = defaultWeapon;
+            SerializedProperty startingWeapons = combatSo.FindProperty("startingWeapons");
+            startingWeapons.arraySize = StartingWeaponPaths.Length;
+            for (int i = 0; i < StartingWeaponPaths.Length; i++)
+                startingWeapons.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<WeaponSO>(StartingWeaponPaths[i]);
             SerializedProperty combo = combatSo.FindProperty("lightComboSequence");
             for (int i = 0; i < combo.arraySize; i++)
             {
@@ -663,6 +692,14 @@ public static class PlayerKnightSetup
             cameraObject.tag = "MainCamera";
             cameraObject.transform.localPosition = new Vector3(0f, height, -3f);
             cameraObject.transform.localRotation = Quaternion.identity;
+
+            // Dos listeners: el de Unity (pasos, fuegos) y el de FMOD (sonido ambiente de Ariel).
+            // El de FMOD se busca por nombre para que la herramienta compile aunque FMOD no esté.
+            if (cameraObject.GetComponent<AudioListener>() == null)
+                cameraObject.AddComponent<AudioListener>();
+            System.Type fmodListener = System.Type.GetType("FMODUnity.StudioListener, FMODUnity");
+            if (fmodListener != null && cameraObject.GetComponent(fmodListener) == null)
+                cameraObject.AddComponent(fmodListener);
 
             ThirdPersonCamera orbit = cameraObject.GetComponent<ThirdPersonCamera>();
             // Estilo Silent Hill 2 (sobre el hombro). Para el estilo souls: clic derecho sobre el

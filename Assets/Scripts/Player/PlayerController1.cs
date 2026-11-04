@@ -63,6 +63,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float iFrameEnd = 0.35f;  
     [SerializeField] private float rollStaminaCost = 20f;
 
+    [Header("Correr")]
+    [Tooltip("Si se queda sin estamina corriendo, no puede volver a correr hasta recuperar esta cantidad " +
+             "(así no arranca y frena a cada rato mientras se regenera).")]
+    [SerializeField] private float sprintRecoverStamina = 25f;
+    private bool sprintExhausted;
+
     [Header("Lock-On")]
     [SerializeField] private float lockOnRadius = 15f;
     [SerializeField] private LayerMask enemyLayer;
@@ -237,7 +243,13 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
         // Otros scripts pueden frenar al personaje (ej.: la lámpara alzada camina más lento y no corre)
         Vector2 input = moveInput * MoveSpeedMultiplier;
-        bool running = isRunning && AllowRunning;
+
+        // Sin estamina no se corre: al llegar a 0 pasa a caminar hasta recuperar sprintRecoverStamina
+        if (stats.CurrentStamina <= 0f)
+            sprintExhausted = true;
+        else if (sprintExhausted && stats.CurrentStamina >= sprintRecoverStamina)
+            sprintExhausted = false;
+        bool running = isRunning && AllowRunning && !sprintExhausted;
 
         // El input no pasa de 0 a 1 de golpe: acelera y frena de a poco (tiempos distintos)
         float smoothTime = input.sqrMagnitude >= smoothedInput.sqrMagnitude ? accelerationTime : decelerationTime;
@@ -470,8 +482,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // BUFFER DE INPUTS
     // ---------------------------------------------------------------
 
-    // Guarda una acción pendiente (por ejemplo, "atacar") para ejecutarla más adelante,
-    // apenas el personaje esté libre de nuevo.
+    // Guarda una acción pendiente (por ejemplo, rodar en medio de un ataque) para ejecutarla
+    // más adelante, apenas el personaje esté libre de nuevo.
     private void BufferInput(System.Action action)
     {
         inputBuffer.Enqueue(action); 
@@ -528,12 +540,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     }
 
     // Se llama al presionar la tecla de ataque liviano.
+    // En medio de un ataque, el golpe se anota directo en el combo (no va al buffer: el buffer
+    // recién corre cuando el personaje vuelve a Idle, y para entonces el combo ya se cortó).
     public void OnLightAttack(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
 
         if (currentState == PlayerState.Attacking)
-            BufferInput(() => combat.QueueNextCombo(false));
+            combat.QueueNextCombo(false); // el próximo golpe sale apenas termine el actual
         else if (currentState != PlayerState.Rolling && currentState != PlayerState.Staggered)
             combat.PerformAttack(false); // false = ataque liviano
     }
@@ -544,7 +558,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!context.performed) return;
 
         if (currentState == PlayerState.Attacking)
-            BufferInput(() => combat.QueueNextCombo(true));
+            combat.QueueNextCombo(true); // remata el combo con el pesado apenas termine el golpe actual
         else if (currentState != PlayerState.Rolling && currentState != PlayerState.Staggered)
             combat.PerformAttack(true); // true = ataque pesado
     }
