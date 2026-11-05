@@ -1,0 +1,15 @@
+Medieval Market Stall Assets 3/4 - Uğur Yakışık (UgurYksk), Sketchfab
+https://sketchfab.com/3d-models/medieval-market-stall-assets-34-15bcb394d60e4e12991ccad82bb8214a
+Licencia: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Hay que darle crédito al autor
+(si el juego tiene créditos, tiene que estar ahí). Texto de crédito que pide:
+
+This work is based on "Medieval Market Stall Assets 3/4" (https://sketchfab.com/3d-models/medieval-market-stall-assets-34-15bcb394d60e4e12991ccad82bb8214a) by Uğur Yakışık (https://sketchfab.com/UgurYksk) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+Descargado el 2026-11-05 en formato glTF.
+- textures/ (color, normal, metallicRoughness y Ground) y scene.gltf son los originales (los trajo Belén).
+- MarketStall.obj es la malla del scene.gltf + scene.bin convertida a OBJ en metros (Unity no importa
+  glTF), sin el piso "Ground". Un objeto por material: BaseBody_03 (el puesto), Prop_01 (armaduras,
+  escudos y armas) y Prop_02 (cajas de madera).
+- textures/*_mask.png son la máscara de URP Lit armada desde *_metallicRoughness.png: metal (R) = B,
+  suavidad (A) = 1 - G. El canal R del original (oclusión) casi siempre está en 0, así que no se usa.
+- Materials/ y Assets/Prefabs/MarketStall.prefab los arma Scripts/Editor/TownShopSetup.cs.

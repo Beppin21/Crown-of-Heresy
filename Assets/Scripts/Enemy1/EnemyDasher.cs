@@ -35,6 +35,11 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     [SerializeField] private float attackCooldown;
     [SerializeField] private float rotationSpeed; 
     [SerializeField] private float trackDuration; // Segundos que te persigue con la mirada
+    [Tooltip("Variación al azar, en cada ataque, del tiempo que te sigue con la mirada antes de embestir (0,4 = ±40 %). " +
+             "Con varios enemigos que te ven a la vez, así no embisten todos juntos.")]
+    [SerializeField, Range(0f, 0.9f)] private float trackVariation = 0.4f;
+    [Tooltip("Pausa extra al azar después de embestir: de 0 a estos segundos, sumados a attackCooldown.")]
+    [SerializeField, Min(0f)] private float cooldownVariation = 1.5f;
     private bool isDashing = false; // Bandera para saber si está en pleno dash
 
     [Header("Referencias")]
@@ -67,6 +72,11 @@ public class EnemyDasher : MonoBehaviour, IDamageable
 
     [Header("Ataque 2 - Onda Expansiva (cíclico)")]
     [SerializeField] private float secondAttackCooldown = 20f; // Segundos de recarga entre cada onda
+    [Tooltip("Variación al azar de cada recarga de la onda (0,25 = ±25 %). La primera espera es más corta y también " +
+             "al azar: todos arrancan a contar al cargar la escena y, si no, la largaban juntos.")]
+    [SerializeField, Range(0f, 0.9f)] private float secondAttackVariation = 0.25f;
+    [Tooltip("Demora extra al azar (de 0 a estos segundos) cuando la onda estaba lista esperando a que el jugador se acerque.")]
+    [SerializeField, Min(0f)] private float secondAttackReactionMax = 2f;
     [SerializeField] private float secondAttackChargeTime = 1.5f; // Tiempo que tarda en cargar el golpe
     [SerializeField] private float secondAttackRange = 5f; // Radio de la onda alrededor del enemigo
     [SerializeField] private float secondAttackDamage = 30f;
@@ -149,9 +159,10 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     {
         isAttacking = true;
 
-        // 1. Te sigue con la mirada MIENTRAS haya línea de visión
+        // 1. Te sigue con la mirada MIENTRAS haya línea de visión (un tiempo distinto en cada ataque)
         float trackTimer = 0f;
-        while (trackTimer < trackDuration)
+        float trackTime = trackDuration * Random.Range(1f - trackVariation, 1f + trackVariation);
+        while (trackTimer < trackTime)
         {
             // Si en cualquier momento una pared se interpone, cancela el ataque
             if (!HasLineOfSight())
@@ -218,8 +229,8 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         rb.linearVelocity = Vector3.zero;
         SetState(IdleState);
 
-        // 5. Cooldown
-        yield return new WaitForSeconds(attackCooldown);
+        // 5. Cooldown, con un poco de azar para que no vuelvan a atacar todos sincronizados
+        yield return new WaitForSeconds(attackCooldown + Random.Range(0f, cooldownVariation));
 
         isAttacking = false;
     }
@@ -386,15 +397,22 @@ public class EnemyDasher : MonoBehaviour, IDamageable
 
     private IEnumerator SecondAttackLoop()
     {
+        bool first = true;
         while (!isDead)
         {
-            // 1. Espera la recarga
-            yield return new WaitForSeconds(secondAttackCooldown);
+            // 1. Espera la recarga (la primera, más corta), con azar para que no la larguen todos juntos
+            float wait = first ? secondAttackCooldown * Random.Range(0.35f, 1f)
+                               : secondAttackCooldown * Random.Range(1f - secondAttackVariation, 1f + secondAttackVariation);
+            first = false;
+            yield return new WaitForSeconds(wait);
 
-            // 2. Espera a que termine el dash (si lo está haciendo) y a que el jugador esté en rango
-            yield return new WaitUntil(() =>
-                isDead || (player != null && !isAttacking &&
-                Vector3.Distance(transform.position, player.position) <= detectionRange));
+            // 2. Espera a que termine el dash (si lo está haciendo) y a que el jugador esté en rango.
+            // Si varios la tenían lista esperando al jugador, cada uno reacciona con una demora distinta
+            System.Func<bool> ready = () => isDead || (player != null && !isAttacking &&
+                Vector3.Distance(transform.position, player.position) <= detectionRange);
+            yield return new WaitUntil(ready);
+            yield return new WaitForSeconds(Random.Range(0f, secondAttackReactionMax));
+            yield return new WaitUntil(ready);
 
             if (isDead) yield break;
 

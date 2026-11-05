@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Punto de reaparición en la entrada de la sala del jefe. Cuando empieza la pelea queda
-// "armado": si el jugador muere, PlayerController recarga el Dungeon y, al cargar, este punto lo
-// pone acá en vez de al principio de la mazmorra (mirando hacia donde apunta la flecha azul).
-// Se desarma al ganarle al jefe o al cargar cualquier otra escena (volver al Town, la victoria...).
+// Punto de reaparición en la entrada de la sala del jefe. YA NO SE USA: al morir se va a la pantalla
+// de derrota y Try Again carga la partida guardada en la última hoguera (hay una afuera de la sala).
+// BossController ya no llama a Arm, así que este punto nunca mueve al jugador. Si se volviera a
+// armar (Arm), al recargar la escena pondría al jugador acá (mirando hacia la flecha azul); se
+// desarma al ganarle al jefe o al cargar cualquier otra escena.
 [DefaultExecutionOrder(-500)]
 public class BossRespawnPoint : MonoBehaviour
 {
