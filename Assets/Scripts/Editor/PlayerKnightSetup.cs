@@ -354,6 +354,9 @@ public static class PlayerKnightSetup
             Debug.Log("[PlayerKnightSetup] Falta la animación de desenvainar o de envainar: la espada va a aparecer/desaparecer " +
                       $"sin animación. Poné en {AnimationsFolder} FBX con \"draw\" y \"sheath\" en el nombre.");
 
+        // Los ataques también van en UpperBody: se puede caminar mientras se ataca (ver PlayerKnightAttackLayer)
+        PlayerKnightAttackLayer.MoveAttacksToUpperBody(controller);
+
         EditorUtility.SetDirty(controller);
         AssetDatabase.SaveAssets();
 

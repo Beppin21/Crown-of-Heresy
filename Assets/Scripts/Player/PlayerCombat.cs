@@ -22,6 +22,8 @@ using UnityEngine.Serialization;
 public class PlayerCombat : MonoBehaviour
 {
     private static readonly int AttackSpeedParam = Animator.StringToHash("AttackSpeed");
+    private const string UpperBodyLayer = "UpperBody";   // capa del Animator donde corren los ataques
+    private const string UpperBodyEmptyState = "Empty";  // su estado "sin animación"
 
     [Header("Referencias")]
     [Tooltip("Hitbox de la espada que trae el personaje (se usa con las armas que no tienen modelo propio).")]
@@ -279,10 +281,31 @@ public class PlayerCombat : MonoBehaviour
         foreach (AttackData attack in lightComboSequence)
             animator.ResetTrigger(attack.animationTrigger);
         animator.ResetTrigger(heavyAttack.animationTrigger);
+        StopUpperBodyAttack();
 
         if (playerController.CurrentState == PlayerState.Attacking)
             playerController.CurrentState = PlayerState.Idle;
         Log("Ataque cortado por la rodada.");
+    }
+
+    // Los ataques corren en la capa UpperBody del Animator (las piernas siguen caminando). El trigger
+    // "Roll" o "Death" solo cambia la capa base, así que el golpe hay que cortarlo acá a mano; si no,
+    // los brazos seguirían atacando mientras el cuerpo rueda o se cae.
+    public void StopUpperBodyAttack()
+    {
+        if (animator == null) return;
+        int layer = animator.GetLayerIndex(UpperBodyLayer);
+        if (layer < 0) return;
+
+        if (IsAttackState(animator.GetCurrentAnimatorStateInfo(layer)) || IsAttackState(animator.GetNextAnimatorStateInfo(layer)))
+            animator.CrossFadeInFixedTime(UpperBodyEmptyState, 0.1f, layer);
+    }
+
+    private bool IsAttackState(AnimatorStateInfo info)
+    {
+        foreach (AttackData attack in lightComboSequence)
+            if (info.IsName(attack.animationTrigger)) return true;
+        return info.IsName(heavyAttack.animationTrigger);
     }
 
     // Devuelve cuál es el próximo golpe liviano del combo, según en qué paso vamos.
