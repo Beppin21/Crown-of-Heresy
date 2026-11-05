@@ -64,7 +64,7 @@ public static class EnemyModelSetup
     // las animaciones de UAL2 y doblaba brazos y piernas para el lado equivocado.
     // Build5: el Avatar vuelve a su mapeo y cada estado se prueba (FixFacing)
     // Build6: el temblor que tenía el cubo, con el personaje era demasiado: 80 % menos (ver ShakeScale)
-    // Build7: las copias giradas se guardan con el giro desde que se crean (ver TurnedCopy)
+    // Build7: las copias giradas se guardan con el giro desde que se crean (ver HumanoidFacing.TurnedCopy)
     private const string BuildVersionLabel = "EnemyMaskedBuild7";
 
     // El temblor de la carga (embestida y onda expansiva) queda en un 20 % del que tenía el cubo:
@@ -466,13 +466,7 @@ public static class EnemyModelSetup
         try
         {
             var probe = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset, preview);
-            probe.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-            Animator animator = probe.GetComponent<Animator>();
-            if (animator == null) animator = probe.AddComponent<Animator>();
-            animator.avatar = avatar;
-            animator.applyRootMotion = false;
-            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate; // sin cámara: si no, no mueve los huesos
-            BindController(animator, controller);
+            Animator animator = HumanoidFacing.PrepareProbe(probe, avatar, controller);
 
             Transform hand = animator.GetBoneTransform(HumanBodyBones.LeftHand);
             if (hand == null)
@@ -493,10 +487,11 @@ public static class EnemyModelSetup
                 string note = "";
                 if (facing < -0.5f)
                 {
-                    AnimationClip copy = TurnedCopy(clip, state.name, out string path, out float offset);
+                    string path = $"{TurnedFolder}/{state.name} (girada).anim";
+                    AnimationClip copy = HumanoidFacing.TurnedCopy(clip, path, out float offset);
                     turned[path] = offset;
                     if (copy != null) state.motion = copy;
-                    BindController(animator, controller);
+                    HumanoidFacing.BindController(animator, controller);
                     facing = Facing(animator, state.name);
                     note = facing > 0.5f ? " (girada)" : " (girada, OJO: sigue mal)";
                 }
@@ -511,7 +506,7 @@ public static class EnemyModelSetup
             else
                 Debug.Log("[EnemyModelSetup] Para dónde mira cada estado (+1 = hacia donde embiste, -1 = de espaldas): " +
                           string.Join(" | ", report));
-            string[] unsaved = turned.Where(t => !SavedWithOffset(t.Key, t.Value)).Select(t => Path.GetFileName(t.Key)).ToArray();
+            string[] unsaved = turned.Where(t => !HumanoidFacing.SavedWithOffset(t.Key, t.Value)).Select(t => Path.GetFileName(t.Key)).ToArray();
             if (unsaved.Length > 0)
                 Debug.LogWarning("[EnemyModelSetup] OJO: estas copias quedaron guardadas sin el giro: " + string.Join(", ", unsaved));
             else if (turned.Count > 0)
@@ -523,58 +518,10 @@ public static class EnemyModelSetup
         }
     }
 
-    private static void BindController(Animator animator, AnimatorController controller)
-    {
-        animator.runtimeAnimatorController = null;
-        animator.runtimeAnimatorController = controller;
-        animator.Rebind();
-    }
-
-    // Frente del cuerpo (caderas y hombros: en Unity frente = Cross(derecha, arriba)) en el estado
-    // dado, comparado con el +Z del Animator
+    // Frente del cuerpo en el estado dado, comparado con el +Z del Animator (hacia donde embiste)
     private static float Facing(Animator animator, string state)
     {
-        animator.Play(state, 0, FacingSampleTime);
-        animator.Update(0f);
-        Transform leftLeg = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
-        Transform rightLeg = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
-        Transform leftArm = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
-        Transform rightArm = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
-        if (leftLeg == null || rightLeg == null || leftArm == null || rightArm == null) return 0f;
-        Vector3 right = rightLeg.position - leftLeg.position + rightArm.position - leftArm.position;
-        Vector3 front = Vector3.ProjectOnPlane(Vector3.Cross(right, Vector3.up), Vector3.up);
-        return front.sqrMagnitude < 1e-8f ? 0f : Vector3.Dot(front.normalized, animator.transform.forward);
-    }
-
-    // Copia de la animación (también las del FBX) con la raíz girada 180°, solo para este enemigo.
-    // El giro se pone antes de crear el archivo, así queda escrito desde el principio. En Build6 se
-    // ponía después, y al crear la copia siguiente Unity recargaba la anterior del disco sin el giro:
-    // Quieto y Zarpazo quedaron guardadas en 0 y, al reabrir Unity, volvió a ponerse de espaldas.
-    // Se devuelve la copia tal como quedó en el disco, para medirla así.
-    private static AnimationClip TurnedCopy(AnimationClip source, string stateName, out string path, out float offset)
-    {
-        if (!AssetDatabase.IsValidFolder(TurnedFolder))
-            AssetDatabase.CreateFolder(ControllerFolder, Path.GetFileName(TurnedFolder));
-        string name = $"{stateName} (girada)";
-        path = $"{TurnedFolder}/{name}.anim";
-        var copy = new AnimationClip();
-        EditorUtility.CopySerialized(source, copy);
-        copy.name = name;
-        AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(copy);
-        settings.orientationOffsetY = Mathf.Repeat(settings.orientationOffsetY + 180f, 360f);
-        AnimationUtility.SetAnimationClipSettings(copy, settings);
-        offset = settings.orientationOffsetY;
-        AssetDatabase.CreateAsset(copy, path);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-        return AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
-    }
-
-    // Lo que importa es lo que quedó escrito: con eso arranca Unity y con eso se entra en Play
-    private static bool SavedWithOffset(string path, float offset)
-    {
-        return File.Exists(path) && File.ReadAllText(path).Contains(
-            "m_OrientationOffsetY: " + offset.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return HumanoidFacing.Facing(animator, state, FacingSampleTime, animator.transform.forward);
     }
 
     private static AnimationClip FirstClip(string path)

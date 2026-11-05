@@ -1,0 +1,8 @@
+Eve By J.Gonzales - personaje de Mixamo (Adobe), https://www.mixamo.com
+Bajado el 2026-11-05 como "FBX for Unity", en T-pose, con sus texturas adentro del FBX.
+Los personajes y animaciones de Mixamo se pueden usar sin pagar regalías en proyectos personales,
+comerciales y sin fines de lucro (términos de Adobe Mixamo).
+
+Es la mercader de la tienda de Town: la arma Scripts/Editor/TownShopSetup.cs (humanoide, idle de
+brazos cruzados de UAL2). Reemplaza a la de Belén (Models/Merchant/source), que es una pose fija sin
+malla pegada al esqueleto y no se puede animar.
