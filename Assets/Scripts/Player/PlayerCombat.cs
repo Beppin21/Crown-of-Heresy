@@ -221,6 +221,9 @@ public class PlayerCombat : MonoBehaviour
         // Con el inventario abierto, el clic es para equipar/desequipar, no para atacar
         if (inventoryUI != null && inventoryUI.IsOpen) return;
 
+        // En pausa el clic es para los botones del menú
+        if (Pause.Pausado) return;
+
         // Recuperación: después de un ataque, cuanto más pesada el arma más hay que esperar
         if (Time.time < nextAttackTime) return;
 

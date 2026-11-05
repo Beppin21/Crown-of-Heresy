@@ -461,7 +461,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // en el piso y que tenga estamina suficiente antes de largar la coroutine.
     private void TryRoll()
     {
-        if (currentState == PlayerState.Attacking || !CanRoll) return;
+        if (Pause.Pausado || currentState == PlayerState.Attacking || !CanRoll) return;
         StartCoroutine(RollRoutine());
     }
 
