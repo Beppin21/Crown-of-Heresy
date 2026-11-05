@@ -727,6 +727,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         inputActions.Player.Disable(); // muerto no responde a ningún input más
         combat.StopAllCoroutines();    // corta un ataque en curso para que no vuelva a pisar el estado
         combat.StopBlocking();         // si murió bloqueando, que un golpe más no lo saque de la animación de muerte
+        combat.StopUpperBodyAttack();  // el golpe corre en la capa UpperBody: que los brazos no sigan atacando
         animator.SetTrigger(stateAnimTrigger[PlayerState.Dead]);
         StartCoroutine(ReloadAfterDeath());
     }
