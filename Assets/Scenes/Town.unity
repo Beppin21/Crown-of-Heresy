@@ -7449,7 +7449,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &284928421
 Transform:
   m_ObjectHideFlags: 0
@@ -13628,6 +13628,7 @@ MonoBehaviour:
   playerMoneyText: {fileID: 1231252591}
   itemContainer: {fileID: 2080408502}
   itemButtonPrefab: {fileID: 2349415895898268683, guid: c78d5d233760d734f972aa962ab02741, type: 3}
+  itemsForSale: []
 --- !u!1001 &497852120
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14092,6 +14093,7 @@ Transform:
   - {fileID: 2050088462}
   - {fileID: 17828}
   - {fileID: 284928421}
+  - {fileID: 1334022103}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &616572558
@@ -20676,19 +20678,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.5443604
+      value: -0.5837341
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.027878994
+      value: -0.029895479
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.83729076
+      value: -0.81033236
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.04288119
+      value: 0.041500527
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20704,19 +20706,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.5443604
+      value: -0.5837341
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.027878989
+      value: -0.029895477
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.83729076
+      value: -0.8103323
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.042881187
+      value: 0.041500527
       objectReference: {fileID: 0}
     - target: {fileID: 2597002262844181907, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: near clip plane
@@ -31862,6 +31864,69 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2090140408}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1334022102
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 610364207}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.342213
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.23002973
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.4627168
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.73077357
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.68262005
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 86.097
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+      propertyPath: m_Name
+      value: SKM_Crossbow_Woman_Pose (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: -3049871688406256318, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+--- !u!4 &1334022103 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f2d3119116e2d0943bed556280a27c81, type: 3}
+  m_PrefabInstance: {fileID: 1334022102}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1355980147 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2480055401952903049, guid: 5cfa8a0010498274490c67cd47046a55, type: 3}
@@ -35964,7 +36029,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1893706984
 MonoBehaviour:
   m_ObjectHideFlags: 0
