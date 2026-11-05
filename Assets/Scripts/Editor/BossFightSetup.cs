@@ -113,8 +113,10 @@ public static class BossFightSetup
         {
             phaseTwo = ((GameObject)PrefabUtility.InstantiatePrefab(astraiaPrefab, boss.transform)).transform;
             Undo.RegisterCreatedObjectUndo(phaseTwo.gameObject, "Armar pelea del jefe");
+            phaseTwo.localPosition = Vector3.zero;
         }
-        phaseTwo.localPosition = Vector3.zero;
+        // Si ya estaba, queda donde la pusieron: Astraía puede aparecer en otro lugar que el
+        // esqueleto (en la sala de Belén, arriba de la escalera; ver BossRoomLayout)
         phaseTwo.localRotation = Quaternion.identity;
         phaseTwo.gameObject.SetActive(true); // prendida un momento para medirla
         Bounds astraiaBounds = RendererBounds(phaseTwo.gameObject);
@@ -172,7 +174,8 @@ public static class BossFightSetup
         var so = new SerializedObject(controller);
         so.FindProperty("phaseOneModel").objectReferenceValue = skeleton.gameObject;
         so.FindProperty("phaseTwoModel").objectReferenceValue = phaseTwo.gameObject;
-        so.FindProperty("phaseTwoCenterHeight").floatValue = Mathf.Max(1f, astraiaBounds.center.y - groundY);
+        // Sobre su propio punto de apoyo: Astraía puede estar más arriba que el esqueleto (en la escalera)
+        so.FindProperty("phaseTwoCenterHeight").floatValue = Mathf.Max(1f, astraiaBounds.center.y - phaseTwo.position.y);
         so.FindProperty("hurtbox").objectReferenceValue = hurtbox;
         so.FindProperty("phaseOneHitbox").objectReferenceValue = phaseOneHitbox;
         so.FindProperty("phaseTwoHitbox").objectReferenceValue = phaseTwoHitbox;
@@ -285,11 +288,13 @@ public static class BossFightSetup
     {
         Component[] targets = controller.GetComponents<BossAttack>().Cast<Component>().Prepend(controller).ToArray();
         if (persist) Undo.RecordObjects(targets, "Valores del jefe");
+        int roomVersion = new SerializedObject(controller).FindProperty("roomVersion").intValue; // no es un valor de ajuste
         foreach (Component target in targets)
             ResetToDefaults(target, target == controller ? MeasuredFields : new string[0]);
         report.Add($"Valores del código en el BossController y {targets.Length - 1} ataques.");
 
         var so = new SerializedObject(controller);
+        so.FindProperty("roomVersion").intValue = roomVersion;
         so.FindProperty("nameFont").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(FontPath);
         so.FindProperty("tuningVersion").intValue = BossController.TuningVersion;
         so.ApplyModifiedPropertiesWithoutUndo();

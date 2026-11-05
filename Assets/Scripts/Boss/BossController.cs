@@ -105,6 +105,11 @@ public class BossController : MonoBehaviour
     public const int TuningVersion = 12;
     [SerializeField, HideInInspector] private int tuningVersion; // 0 en las escenas de antes de que existiera
 
+    // Versión de los arreglos de la sala del jefe que hace BossRoomLayout (editor) en la escena:
+    // dónde va cada fase, hacia dónde mira Astraía, luces de las ventanas. Se aplican solos una vez.
+    public const int RoomVersion = 2;
+    [SerializeField, HideInInspector] private int roomVersion;
+
     private State state = State.Waiting;
     private float health;
     private float groundY;
