@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
   itemName: Featherlight Rapier
   description: So light it barely exists. Each strike is little more than a scratch, but it strikes faster than the eye can follow.
-  value: 80
+  value: 120
   weaponType: {fileID: 11400000, guid: 65c1159c79dd7891ac8cfb75c122f11e, type: 2}
   damage: 5
   weight: 0.5

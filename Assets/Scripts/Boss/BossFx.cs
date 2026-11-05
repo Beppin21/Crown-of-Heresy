@@ -86,6 +86,25 @@ public static class BossFx
         return point;
     }
 
+    // Altura del piso justo debajo de "from": un rayo hacia abajo desde ese mismo punto (sin contar
+    // al jugador ni al jefe). Lo usan las esferas que van siguiendo el piso.
+    public static bool FloorBelow(Vector3 from, float maxDistance, out float floorY)
+    {
+        floorY = from.y;
+        int count = Physics.RaycastNonAlloc(from, Vector3.down, groundHits, maxDistance, ~0, QueryTriggerInteraction.Ignore);
+        float best = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            if (IsPlayerOrBoss(groundHits[i].collider)) continue;
+            if (groundHits[i].distance < best)
+            {
+                best = groundHits[i].distance;
+                floorY = groundHits[i].point.y;
+            }
+        }
+        return best < float.MaxValue;
+    }
+
     // Disco de radio 1, acostado en el piso (normal hacia arriba)
     public static Mesh Disc
     {

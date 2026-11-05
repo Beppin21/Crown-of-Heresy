@@ -64,9 +64,9 @@ public class BossController : MonoBehaviour
     [SerializeField] private float phaseTwoHitboxPadding = 1.8f;
 
     [Header("Barra de vida")]
-    [SerializeField] private string phaseOneName = "El Hereje Coronado";
+    [SerializeField] private string phaseOneName = "The Crowned Heretic";
     [SerializeField] private string phaseTwoName = "Astraía";
-    [SerializeField] private string victoryText = "ASTRAÍA HA CAÍDO";
+    [SerializeField] private string victoryText = "ASTRAÍA HAS FALLEN";
     [SerializeField] private TMP_FontAsset nameFont;
 
     [Header("Cambio de fase")]
@@ -103,7 +103,12 @@ public class BossController : MonoBehaviour
     // más vieja, BossFightSetup pone solos los valores del código al abrir Unity (los cambios de
     // valores en el código no llegan a la escena por sí solos). Subirla cada vez que se cambian los
     // valores por defecto de BossController o de algún ataque.
-    public const int TuningVersion = 12;
+    // 13: el nombre de la primera fase en inglés (The Crowned Heretic)
+    // 14: el cartel de victoria en inglés (ASTRAÍA HAS FALLEN)
+    // 15: el hueco de los aros de Astraía, de 4 esferas a 2 (no tenía dificultad)
+    // 16: hueco de una esfera, nunca en el mismo lugar que el del aro anterior, y alcance de rodada (hasta 4.8 m)
+    // 17: el hueco a la mitad de distancia (hasta 2.4 m), más amigable
+    public const int TuningVersion = 17;
     [SerializeField, HideInInspector] private int tuningVersion; // 0 en las escenas de antes de que existiera
 
     // Versión de los arreglos de la sala del jefe que hace BossRoomLayout (editor) en la escena:
@@ -760,7 +765,7 @@ public class BossController : MonoBehaviour
         return null;
     }
 
-    private void Log(string message)
+    public void Log(string message)
     {
         if (debugLogs) Debug.Log($"[Jefe] {message}", this);
     }

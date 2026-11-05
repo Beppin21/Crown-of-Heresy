@@ -199,9 +199,14 @@ public static class SaveSystem
             Debug.LogWarning("[Guardado] No encontré al jugador (tag Player) para ubicarlo donde se guardó.");
             return;
         }
-        Transform cuerpo = jugador.transform;
         Vector3 posicion = new Vector3(datos.posicion[0], datos.posicion[1], datos.posicion[2]);
-        Quaternion giro = Quaternion.Euler(0f, datos.rotacionY, 0f);
+        MoverJugador(jugador.transform, posicion, Quaternion.Euler(0f, datos.rotacionY, 0f));
+    }
+
+    // Lleva al jugador a esa posición y giro. Se mueve todo el prefab (cámara incluida), no solo el
+    // cuerpo. Lo usa también el atajo de prueba para ir a la puerta del jefe (AtajoPuertaJefe).
+    public static void MoverJugador(Transform cuerpo, Vector3 posicion, Quaternion giro)
+    {
         cuerpo.root.position += posicion - cuerpo.position;
         cuerpo.rotation = giro;
 
