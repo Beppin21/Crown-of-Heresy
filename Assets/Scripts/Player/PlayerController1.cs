@@ -53,7 +53,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float groundCheckOffset = 0.1f; // cuánto por debajo de los pies se busca el piso
 
     [Header("Muerte")]
-    [SerializeField] private string deathSceneName = "Dungeon";
+    [Tooltip("Escena a la que se va al morir: la pantalla de derrota, cuyo Try Again vuelve a la última hoguera.")]
+    [SerializeField] private string defeatSceneName = "MainDefeat";
     [SerializeField] private float deathReloadDelay = 3f;
 
     [Header("Rodada (Roll / Dodge)")]
@@ -61,7 +62,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] private float rollSpeed = 7f;
     [SerializeField] private float iFrameStart = 0.05f; 
     [SerializeField] private float iFrameEnd = 0.35f;  
-    [SerializeField] private float rollStaminaCost = 20f;
+    [SerializeField] private float rollStaminaCost = 16f;
 
     [Header("Correr")]
     [Tooltip("Si se queda sin estamina corriendo, no puede volver a correr hasta recuperar esta cantidad " +
@@ -111,6 +112,13 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     private readonly bool[] animationHasRootMotion = { true, true, true, true };
     private static readonly string[] GaitNames = { "sin espada caminando", "sin espada corriendo", "con espada caminando", "con espada corriendo" };
     private const int RootMotionSamplesNeeded = 25; // ~0,5 s
+    // Un set marcado con root motion cuya animación igual no lo mueve (a fondo, menos de StuckRatio de
+    // lo pedido durante StuckRemeasureAfter segundos) se vuelve a medir: nunca queda corriendo en el lugar
+    private const float StuckRatio = 0.1f;
+    private const float StuckRemeasureAfter = 0.5f;
+    private readonly float[] stuckTime = new float[4];
+    private static readonly int ArmedParam = Animator.StringToHash("Armed");
+    private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private bool currentArmed;
     private bool currentRunning;
     private float lastRootSpeed;
@@ -337,10 +345,36 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
         // Medición (una sola vez por set): con el input a fondo, ¿la animación avanza o es
         // "en el lugar"? Recién cuando hay suficientes muestras se decide.
+        // Solo se mide con el Animator ya en las animaciones de este set. "Armed" tarda en pasar de un
+        // set al otro (SetFloat amortiguado), y al guardar la espada corriendo (o al rodar, que la guarda
+        // de golpe) se medía la carrera con espada, que avanza sola, como si fuera la de sin espada, que
+        // es en el lugar: quedaba marcada con root motion y el personaje corría sin moverse.
         float desiredSpeed = desiredVelocity.magnitude;
         float gaitSpeed = currentRunning ? runSpeed : walkSpeed;
+        bool fullInput = desiredSpeed > gaitSpeed * 0.75f;
+        bool armedSettled = Mathf.Abs(animator.GetFloat(ArmedParam) - (currentArmed ? 1f : 0f)) < 0.05f;
+        bool settled = armedSettled && (currentArmed || animator.GetFloat(SpeedParam) > gaitSpeed * 0.75f);
         bool measuring = rootMotionSamples[set] < RootMotionSamplesNeeded;
-        if (measuring && desiredSpeed > gaitSpeed * 0.75f)
+
+        // Marcado con root motion (o todavía sin medir) pero la animación no lo mueve: ese set pasa a
+        // moverse por código. Así nunca queda corriendo en el lugar, aunque una medición salga mal
+        if (animationHasRootMotion[set] && armedSettled && desiredSpeed > gaitSpeed * 0.5f &&
+            lastRootSpeed < desiredSpeed * StuckRatio)
+        {
+            stuckTime[set] += dt;
+            if (stuckTime[set] > StuckRemeasureAfter)
+            {
+                animationHasRootMotion[set] = false;
+                rootMotionSamples[set] = RootMotionSamplesNeeded;
+                measuring = false;
+                stuckTime[set] = 0f;
+                if (debugMovement)
+                    Debug.Log($"[PlayerController] Las animaciones {GaitNames[set]} no avanzan aunque estaban marcadas con root motion: se mueve por código.", this);
+            }
+        }
+        else stuckTime[set] = 0f;
+
+        if (measuring && settled && fullInput)
         {
             float ratio = lastRootSpeed / desiredSpeed;
             rootMotionRatio[set] = rootMotionSamples[set] == 0 ? ratio : Mathf.Lerp(rootMotionRatio[set], ratio, 0.15f);
@@ -427,12 +461,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // en el piso y que tenga estamina suficiente antes de largar la coroutine.
     private void TryRoll()
     {
-        if (isRolling || currentState == PlayerState.Attacking) return;
-        if (!IsGrounded) return; // no se rueda en el aire
-        if (!stats.HasEnoughStamina(rollStaminaCost)) return;
-
+        if (currentState == PlayerState.Attacking || !CanRoll) return;
         StartCoroutine(RollRoutine());
     }
+
+    // En el piso, sin estar rodando ya y con estamina para la rodada (no se rueda en el aire)
+    private bool CanRoll => !isRolling && IsGrounded && stats.HasEnoughStamina(rollStaminaCost);
 
 
     private IEnumerator RollRoutine()
@@ -527,13 +561,20 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         else if (context.canceled) isRunning = false;
     }
 
-    // Se llama al presionar la tecla de rodar/esquivar.
+    // Se llama al presionar la tecla de rodar/esquivar. En medio de un ataque, rodar lo corta en
+    // el acto (para esquivar al jefe sin esperar a que termine el golpe); si no se puede rodar
+    // (sin estamina), queda en el buffer para cuando termine.
     public void OnRoll(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
         if (ZoneSettings.LanternMode) return; // en modo lámpara no se rueda (se explora caminando)
 
-        if (currentState == PlayerState.Attacking || currentState == PlayerState.Blocking)
+        if (currentState == PlayerState.Attacking && CanRoll)
+        {
+            combat.CancelAttack();
+            TryRoll();
+        }
+        else if (currentState == PlayerState.Attacking || currentState == PlayerState.Blocking)
             BufferInput(TryRoll);
         else
             TryRoll();
@@ -675,11 +716,13 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         StartCoroutine(ReloadAfterDeath());
     }
 
-    // Deja ver la animación de muerte y después recarga la escena.
+    // Deja ver la animación de muerte y después va a la pantalla de derrota (Try Again carga la
+    // partida guardada en la última hoguera; sin partida, vuelve a esta escena desde el principio)
     private IEnumerator ReloadAfterDeath()
     {
         yield return new WaitForSeconds(deathReloadDelay);
-        SceneManager.LoadScene(deathSceneName);
+        SaveSystem.RegistrarMuerte(gameObject.scene.name);
+        SceneManager.LoadScene(defeatSceneName);
     }
 }
 

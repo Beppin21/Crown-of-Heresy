@@ -41,7 +41,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [SerializeField] private float maxStamina = 100f;
     [SerializeField] private float staminaRegenPerSecond = 15f;
     [SerializeField] private float staminaRegenDelay = 1f; // pausa tras gastar estamina antes de empezar a regenerar
-    public float SprintStaminaCostPerSecond = 12f;
+    public float SprintStaminaCostPerSecond = 5f; // era 12: correr dejaba sin estamina para esquivar
     private float currentStamina;
     private float lastStaminaUseTime;
 

@@ -27,24 +27,19 @@ public class MainMenu : MonoBehaviour
             CerrarPaneles();
     }
 
+    // Partida nueva: borra la guardada (hay un solo lugar) y arranca sin ítems ni plata
     public void NuevaPartida()
     {
+        SaveSystem.NuevaPartida();
         Time.timeScale = 1f;
         SceneManager.LoadScene(escenaNuevaPartida);
     }
 
+    // Vuelve a la partida guardada: inventario, plata, armas, tienda y la última hoguera
     public void CargarPartida()
     {
-        SaveData datos = SaveSystem.Cargar();
-        if (datos == null)
-        {
+        if (!SaveSystem.CargarPartida())
             Debug.Log("No hay partida guardada");
-            return;
-        }
-
-        SaveSystem.CargandoPartida = true;
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(datos.escena);
     }
 
     public void AbrirOpciones()

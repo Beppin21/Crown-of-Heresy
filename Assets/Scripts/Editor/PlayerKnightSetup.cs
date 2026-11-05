@@ -29,9 +29,9 @@ public static class PlayerKnightSetup
     private const string NoFrictionPath = "Assets/Materials/PlayerSinFriccion.physicMaterial";
     private const string BarFontPath = "Assets/fonts/BECKETT.asset"; // fuente del número de la barra de vida
     private const string DefaultWeaponPath ="Assets/Prefabs/Weapons/Knight Sword.asset"; // arma inicial (WeaponSO)
-    // Otras armas iniciales (WeaponSO): una más liviana y otra más pesada que la inicial
-    private static readonly string[] StartingWeaponPaths =
-        { "Assets/Prefabs/Weapons/Basic Sword.asset", "Assets/Prefabs/Weapons/Heavy Sword.asset" };
+    // Otras armas iniciales (WeaponSO). Ninguna: se arranca solo con la del caballero y las demás se
+    // compran en la tienda (Assets/Resources/ShopCatalog.asset)
+    private static readonly string[] StartingWeaponPaths = { };
 
     private const string KnightChildName = "KnightModel";
     private const string CameraTargetName = "CameraTarget";

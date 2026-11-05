@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyDasher : MonoBehaviour, IDamageable
 {
     [Header("Invulnerabilidad")]
-    [SerializeField] private float damageCooldown = 0.3f; // Tiempo mínimo entre impactos (corto: el jugador ya no repite daño en un mismo golpe)
+    [SerializeField] private float damageCooldown = 0.15f; // Tiempo mínimo entre impactos (corto: el jugador ya no repite daño en un mismo golpe, y el Featherlight Rapier pega cada ~0.22 s)
     private float lastDamageTime = -999f;
 
     [Header("Feedback de Daño")]
@@ -22,15 +22,24 @@ public class EnemyDasher : MonoBehaviour, IDamageable
 
     [Header("Detección")]
     [SerializeField] private float detectionRange = 10f;
+    [Tooltip("Altura de los ojos sobre el centro del enemigo (el piso está 0.5 m más abajo): de ahí sale el rayo que busca al jugador.")]
+    [SerializeField] private float eyeHeight = 1.25f;
+    private readonly RaycastHit[] sightHits = new RaycastHit[12];
 
     [Header("Ataque")]
     [SerializeField] private float shakeDuration;
-    [SerializeField] private float shakeIntensity;
+    [Tooltip("Cuánto tiembla el modelo (metros) mientras carga la embestida: un aviso leve.")]
+    [SerializeField] private float shakeIntensity = 0.03f;
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDuration;
     [SerializeField] private float attackCooldown;
     [SerializeField] private float rotationSpeed; 
     [SerializeField] private float trackDuration; // Segundos que te persigue con la mirada
+    [Tooltip("Variación al azar, en cada ataque, del tiempo que te sigue con la mirada antes de embestir (0,4 = ±40 %). " +
+             "Con varios enemigos que te ven a la vez, así no embisten todos juntos.")]
+    [SerializeField, Range(0f, 0.9f)] private float trackVariation = 0.4f;
+    [Tooltip("Pausa extra al azar después de embestir: de 0 a estos segundos, sumados a attackCooldown.")]
+    [SerializeField, Min(0f)] private float cooldownVariation = 1.5f;
     private bool isDashing = false; // Bandera para saber si está en pleno dash
 
     [Header("Referencias")]
@@ -41,12 +50,38 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     private Rigidbody rb;
     private bool isAttacking = false;
 
+    [Header("Animaciones (las arma EnemyModelSetup)")]
+    [Tooltip("Animator del modelo. Si queda vacío se busca en los hijos; sin Animator el enemigo funciona igual, sin animaciones.")]
+    [SerializeField] private Animator animator;
+    [Tooltip("Segundos que queda el cuerpo en el piso, con la animación de muerte, antes de desaparecer.")]
+    [SerializeField] private float corpseDuration = 4.5f;
+    [SerializeField] private float animationBlend = 0.15f;
+
+    [Tooltip("Grados que le faltan para mirar al jugador a partir de los cuales camina en el lugar mientras gira.")]
+    [SerializeField] private float turnAnimationAngle = 8f;
+
+    // Estados del Animator Controller (MaskedEnemy.controller). Los que no se repiten vuelven solos a "Quieto".
+    private const string IdleState = "Quieto";
+    private const string TurnState = "Girar";       // camina en el lugar mientras gira hacia el jugador
+    private const string WindUpState = "Carga";     // agachado, tomando impulso (mientras tiembla)
+    private const string DashState = "Embestida";   // corre a toda velocidad durante el dash
+    private const string BlastState = "Zarpazo";    // carga de la onda expansiva
+    private const string HitState = "Golpe";
+    private const string DeathState = "Muerte";
+    private string currentState;
+
     [Header("Ataque 2 - Onda Expansiva (cíclico)")]
     [SerializeField] private float secondAttackCooldown = 20f; // Segundos de recarga entre cada onda
+    [Tooltip("Variación al azar de cada recarga de la onda (0,25 = ±25 %). La primera espera es más corta y también " +
+             "al azar: todos arrancan a contar al cargar la escena y, si no, la largaban juntos.")]
+    [SerializeField, Range(0f, 0.9f)] private float secondAttackVariation = 0.25f;
+    [Tooltip("Demora extra al azar (de 0 a estos segundos) cuando la onda estaba lista esperando a que el jugador se acerque.")]
+    [SerializeField, Min(0f)] private float secondAttackReactionMax = 2f;
     [SerializeField] private float secondAttackChargeTime = 1.5f; // Tiempo que tarda en cargar el golpe
     [SerializeField] private float secondAttackRange = 5f; // Radio de la onda alrededor del enemigo
     [SerializeField] private float secondAttackDamage = 30f;
-    [SerializeField] private float secondAttackShakeIntensity = 0.1f;
+    [Tooltip("Temblor máximo (metros) al final de la carga de la onda expansiva.")]
+    [SerializeField] private float secondAttackShakeIntensity = 0.02f;
     private Coroutine secondAttackLoop;
 
     void Start()
@@ -54,6 +89,7 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
 
         rb = GetComponent<Rigidbody>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
@@ -74,7 +110,7 @@ public class EnemyDasher : MonoBehaviour, IDamageable
 
     void Update()
     {
-        if (player == null || isAttacking) return;
+        if (isDead || player == null || isAttacking) return;
 
         // Solo chequea línea de visión si está dentro del rango
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -87,38 +123,51 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         }
     }
 
+    // Desde los ojos hasta el pecho del jugador. Los colliders del propio enemigo no tapan la vista
+    // (antes el rayo salía de adelante del cuerpo y, con el jugador al costado o atrás, chocaba
+    // contra el enemigo mismo y nunca lo veía).
     bool HasLineOfSight()
     {
-        // Salimos medio metro arriba y un toque hacia adelante para no chocar el collider propio
-        Vector3 origin = transform.position + Vector3.up * 0.3f + transform.forward * 0.6f;
-        Vector3 target = player.position + Vector3.up * 0.5f;
-        Vector3 direction = (target - origin).normalized;
-        float distance = Vector3.Distance(origin, target);
+        Vector3 origin = transform.position + Vector3.up * eyeHeight;
+        Vector3 target = player.position + Vector3.up * 1f;
+        Vector3 toTarget = target - origin;
+        float distance = toTarget.magnitude;
+        if (distance < 0.01f) return true;
+        Vector3 direction = toTarget / distance;
 
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
+        int count = Physics.RaycastNonAlloc(origin, direction, sightHits, distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        Collider nearest = null;
+        float nearestDistance = float.MaxValue;
+        for (int i = 0; i < count; i++)
         {
-            if (hit.collider.CompareTag("Player"))
+            Collider other = sightHits[i].collider;
+            if (other == null || other.transform.IsChildOf(transform)) continue;
+            if (sightHits[i].distance < nearestDistance)
             {
-                Debug.DrawRay(origin, direction * distance, Color.green);
-                return true; 
+                nearestDistance = sightHits[i].distance;
+                nearest = other;
             }
         }
 
-        Debug.DrawRay(origin, direction * distance, Color.red);
-        return false;
+        // Nada en el medio, o lo primero que toca es el jugador
+        bool sees = nearest == null || nearest.CompareTag("Player") || nearest.transform.IsChildOf(player) || player.IsChildOf(nearest.transform);
+        Debug.DrawRay(origin, direction * (nearest != null ? nearestDistance : distance), sees ? Color.green : Color.red);
+        return sees;
     }
 
     IEnumerator AttackRoutine()
     {
         isAttacking = true;
 
-        // 1. Te sigue con la mirada MIENTRAS haya línea de visión
+        // 1. Te sigue con la mirada MIENTRAS haya línea de visión (un tiempo distinto en cada ataque)
         float trackTimer = 0f;
-        while (trackTimer < trackDuration)
+        float trackTime = trackDuration * Random.Range(1f - trackVariation, 1f + trackVariation);
+        while (trackTimer < trackTime)
         {
             // Si en cualquier momento una pared se interpone, cancela el ataque
             if (!HasLineOfSight())
             {
+                SetState(IdleState);
                 isAttacking = false;
                 yield break; // Corta la corrutina acá mismo y vuelve a Idle
             }
@@ -134,6 +183,8 @@ public class EnemyDasher : MonoBehaviour, IDamageable
                     targetRotation,
                     rotationSpeed * Time.deltaTime
                 );
+                // Mientras le falta girar, camina en el lugar; cuando ya mira al jugador, queda quieto
+                SetState(Quaternion.Angle(transform.rotation, targetRotation) > turnAnimationAngle ? TurnState : IdleState);
             }
 
             trackTimer += Time.deltaTime;
@@ -143,7 +194,10 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         // 2. Fija la dirección exacta hacia donde quedó mirando
         Vector3 dashDir = transform.forward;
 
-        // 3. Temblar 
+        // Se agacha para tomar impulso mientras tiembla
+        SetState(WindUpState);
+
+        // 3. Temblar
         Vector3 initialVisualLocalPos = visualTransform.localPosition;
         float elapsed = 0f;
         while (elapsed < shakeDuration)
@@ -155,7 +209,8 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         }
         visualTransform.localPosition = initialVisualLocalPos;
 
-        // 4. Dash
+        // 4. Dash: sale corriendo
+        SetState(DashState);
         isDashing = true;
         if (hitboxObject != null) hitboxObject.SetActive(true); // Se hace visible y activa el trigger
 
@@ -172,9 +227,10 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         isDashing = false;
         if (hitboxObject != null) hitboxObject.SetActive(false);
         rb.linearVelocity = Vector3.zero;
+        SetState(IdleState);
 
-        // 5. Cooldown
-        yield return new WaitForSeconds(attackCooldown);
+        // 5. Cooldown, con un poco de azar para que no vuelvan a atacar todos sincronizados
+        yield return new WaitForSeconds(attackCooldown + Random.Range(0f, cooldownVariation));
 
         isAttacking = false;
     }
@@ -213,8 +269,35 @@ public class EnemyDasher : MonoBehaviour, IDamageable
         }
         else
         {
+            if (!isAttacking) PlayAnimation(HitState); // no corta una carga ni una embestida
             TurnTowardsTarget();
         }
+    }
+
+    private void PlayAnimation(string state)
+    {
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null) return;
+        animator.CrossFadeInFixedTime(state, animationBlend);
+        currentState = state;
+    }
+
+    // Para los estados que se repiten: solo cambia si no estaba ya en ese (se llama en cada frame
+    // mientras gira). Los que no se repiten vuelven solos a "Quieto" en el Animator, así que después
+    // de uno de esos se vuelve a pedir el estado.
+    private void SetState(string state)
+    {
+        if (animator == null) return;
+        bool inOneShot = currentState == HitState || currentState == BlastState;
+        if (state == currentState && !inOneShot) return;
+        if (inOneShot && animator.GetCurrentAnimatorStateInfo(0).IsName(currentState) && state == IdleState) return; // que termine
+        PlayAnimation(state);
+    }
+
+    private void RestoreColors()
+    {
+        if (enemyRenderers == null) return;
+        for (int i = 0; i < enemyRenderers.Length; i++)
+            if (enemyRenderers[i] != null) enemyRenderers[i].material.color = originalColors[i];
     }
 
     private IEnumerator DamageFlashRoutine()
@@ -251,8 +334,30 @@ public class EnemyDasher : MonoBehaviour, IDamageable
             Debug.LogWarning("No asignaste el lootPrefab en el Inspector del enemigo.");
         }
 
-        // 2. Destruye al enemigo de la escena
-        Destroy(gameObject);
+        // 2. Con modelo animado, cae y queda un rato en el piso: sin ataques, sin colisiones y sin
+        // recibir golpes. Sin Animator desaparece en el acto, como antes.
+        bool animated = animator != null && animator.isActiveAndEnabled && animator.runtimeAnimatorController != null;
+        if (!animated)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        StopAllCoroutines(); // ataques, onda expansiva y el destello rojo
+        RestoreColors();
+        isDashing = false;
+        if (hitboxObject != null) hitboxObject.SetActive(false);
+        if (visualTransform != null) visualTransform.localPosition = Vector3.zero;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+        foreach (Collider body in GetComponents<Collider>())
+            body.enabled = false;
+
+        PlayAnimation(DeathState);
+        Destroy(gameObject, corpseDuration);
     }
 
     public void TurnTowardsTarget()
@@ -292,15 +397,22 @@ public class EnemyDasher : MonoBehaviour, IDamageable
 
     private IEnumerator SecondAttackLoop()
     {
+        bool first = true;
         while (!isDead)
         {
-            // 1. Espera la recarga
-            yield return new WaitForSeconds(secondAttackCooldown);
+            // 1. Espera la recarga (la primera, más corta), con azar para que no la larguen todos juntos
+            float wait = first ? secondAttackCooldown * Random.Range(0.35f, 1f)
+                               : secondAttackCooldown * Random.Range(1f - secondAttackVariation, 1f + secondAttackVariation);
+            first = false;
+            yield return new WaitForSeconds(wait);
 
-            // 2. Espera a que termine el dash (si lo está haciendo) y a que el jugador esté en rango
-            yield return new WaitUntil(() =>
-                isDead || (player != null && !isAttacking &&
-                Vector3.Distance(transform.position, player.position) <= detectionRange));
+            // 2. Espera a que termine el dash (si lo está haciendo) y a que el jugador esté en rango.
+            // Si varios la tenían lista esperando al jugador, cada uno reacciona con una demora distinta
+            System.Func<bool> ready = () => isDead || (player != null && !isAttacking &&
+                Vector3.Distance(transform.position, player.position) <= detectionRange);
+            yield return new WaitUntil(ready);
+            yield return new WaitForSeconds(Random.Range(0f, secondAttackReactionMax));
+            yield return new WaitUntil(ready);
 
             if (isDead) yield break;
 
@@ -312,6 +424,7 @@ public class EnemyDasher : MonoBehaviour, IDamageable
     {
         isAttacking = true; // Bloquea el dash mientras carga la onda
         if (rb != null) rb.linearVelocity = Vector3.zero;
+        PlayAnimation(BlastState); // el zarpazo baja justo cuando sale la onda
 
         // 1. Carga: tiembla cada vez más fuerte
         Vector3 initialVisualLocalPos = visualTransform.localPosition;

@@ -8,13 +8,20 @@ public class Bonfire : MonoBehaviour
 
     private float nextHealTime;
 
-    // Al llegar a la fogata se guarda la partida (escena y posición del jugador)
+    // Cuál es esta hoguera: la escena, el nombre y dónde está (para no volver a guardar en la misma)
+    public string Id => $"{gameObject.scene.name}/{name} ({Mathf.RoundToInt(transform.position.x)}, {Mathf.RoundToInt(transform.position.z)})";
+
+    // Al entrar en el rango de la hoguera (este trigger) se guarda la partida, salvo que sea la misma
+    // hoguera de la última vez: entrar dos veces seguidas en la misma no vuelve a guardar
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
+        string id = Id;
+        if (SaveSystem.UltimaHoguera == id) return;
 
-        PlayerSave save = other.GetComponentInParent<PlayerSave>();
-        if (save != null) save.GuardarPartida();
+        Transform player = other.attachedRigidbody != null ? other.attachedRigidbody.transform : other.transform;
+        SaveSystem.GuardarPartida(player, id);
+        SaveNotice.Show("GAME SAVED");
     }
 
     private void OnTriggerStay(Collider other)

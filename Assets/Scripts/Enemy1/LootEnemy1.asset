@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: LootEnemy1
   m_EditorClassIdentifier: Assembly-CSharp::LootData
   itemName: Magic Cube
-  description: It has some of the old magic that the enemy etc etc etc
+  description: A small cube still humming with the old magic of the creature that carried it. Merchants pay well for it.
   value: 25
+  basicLoot: 1

@@ -10,7 +10,7 @@ public class Door : MonoBehaviour, IInteractable
 
     [Header("Cerradura / Llave")]
     [SerializeField] private bool requiresKey = false;
-    [SerializeField] private string requiredKeyName = "Weird Key";
+    [SerializeField] private string requiredKeyName = "Ancient Seal Key"; // la llave del jefe que vende la tienda
     [SerializeField] private GameObject lockedPanel; // Panel o texto que dice "Necesitas la llave"
     [SerializeField] private float feedbackDuration = 2f; // Cuánto dura el cartel en pantalla
 
