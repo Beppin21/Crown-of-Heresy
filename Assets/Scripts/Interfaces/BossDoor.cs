@@ -58,7 +58,7 @@ public class BossDoor : MonoBehaviour, IInteractable
         FindPlayer();
         bool near = !isOpen && !opening && player != null && IsNear(player.position);
 
-        if (near && interactAction != null && interactAction.WasPressedThisFrame())
+        if (near && !Pause.Pausado && interactAction != null && interactAction.WasPressedThisFrame())
             Interact(player.gameObject);
 
         // Mensaje temporal (llave), si no el aviso de la tecla, si no nada

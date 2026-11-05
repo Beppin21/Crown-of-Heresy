@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 // Menú de pausa: el botón "||" (o Escape) pausa el juego y muestra el menú de pausa.
 // Los botones del menú llaman a Reanudar() y SalirDelJuego() / SalirAlMenu() desde su OnClick()
+// Corre antes que el resto (DefaultExecutionOrder): la tienda también se cierra con Escape, y si
+// ShopTrigger leía la tecla primero, en el mismo frame se cerraba la tienda y se abría la pausa.
+[DefaultExecutionOrder(-100)]
 public class Pause : MonoBehaviour
 {
     [Tooltip("Botón de pausa (||). Si queda vacío, el script crea uno arriba a la derecha")]
@@ -37,7 +40,10 @@ public class Pause : MonoBehaviour
 
     void Start()
     {
+        // Cada escena arranca sin pausa (por si se cargó otra con el juego pausado, por ejemplo
+        // con el atajo de prueba Ctrl + Shift + J)
         Pausado = false;
+        Time.timeScale = 1f;
         if (botonPausa == null) botonPausa = CrearBotonPausa();
         botonPausa.SetActive(true);
         if (menuPausa != null) menuPausa.SetActive(false);
@@ -72,8 +78,10 @@ public class Pause : MonoBehaviour
         botonPausa.SetActive(true);
         if (menuPausa != null) menuPausa.SetActive(false);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // Si se pausó con el inventario o la tienda abiertos (con el botón ||), el mouse sigue libre
+        bool interfazAbierta = InventoryUI.OpenNow || ShopTrigger.Current != null;
+        Cursor.lockState = interfazAbierta ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = interfazAbierta;
     }
 
     public void SalirAlMenu()

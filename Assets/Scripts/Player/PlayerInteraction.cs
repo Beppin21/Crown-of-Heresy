@@ -10,6 +10,8 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        if (Pause.Pausado) return; // en pausa no se abre la tienda ni se agarra nada
+
         if (InputSystem.actions.FindAction("Interact").WasPressedThisFrame())
         {
             TryInteract();

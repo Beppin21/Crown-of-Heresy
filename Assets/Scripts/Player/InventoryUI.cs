@@ -175,7 +175,9 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (InputSystem.actions.FindAction("Inventory").WasPressedThisFrame())
+        // En pausa Tab no hace nada: al cerrarse, el inventario traba el mouse y el menú de pausa
+        // quedaría sin cursor
+        if (!Pause.Pausado && InputSystem.actions.FindAction("Inventory").WasPressedThisFrame())
         {
             ToggleInventory();
         }

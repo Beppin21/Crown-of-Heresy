@@ -67,8 +67,11 @@ public class PlayerFootsteps : MonoBehaviour
         moved.y = 0f;
         lastPosition = position;
         float speed = Time.deltaTime > 0f ? moved.magnitude / Time.deltaTime : 0f;
+        // Atacando también: se puede caminar atacando (el golpe va en la capa UpperBody) y las
+        // piernas dan pasos de verdad; quieto no suena porque no se mueve
         bool walking = controller == null ||
-                       controller.CurrentState == PlayerState.Moving || controller.CurrentState == PlayerState.Sprinting;
+                       controller.CurrentState == PlayerState.Moving || controller.CurrentState == PlayerState.Sprinting ||
+                       controller.CurrentState == PlayerState.Attacking;
         bool moving = walking && speed > minSpeed;
 
         for (int i = 0; i < feet.Length; i++)
