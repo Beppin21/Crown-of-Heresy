@@ -29,6 +29,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [Tooltip("Segundos que tarda en frenar. Más alto = frena más despacio (da un paso más).")]
     [SerializeField] private float decelerationTime = 0.2f;
 
+    [Header("Moverse atacando")]
+    [Tooltip("Tildado: se puede caminar mientras se ataca (el ataque va en la capa UpperBody del Animator " +
+             "y las piernas siguen con la locomoción). Destildado: el personaje se queda quieto al atacar.")]
+    [SerializeField] private bool moveWhileAttacking = true;
+    [Tooltip("Velocidad al caminar atacando, respecto de la normal (0.5 = la mitad). Atacando no se corre.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float attackMoveSpeed = 0.5f;
+
     [Header("Giro")]
     [Tooltip("Segundos que tarda el cuerpo en alinearse con la dirección deseada. Más alto = giro más lento y suave.")]
     [SerializeField] private float turnSmoothTime = 0.18f;
@@ -246,18 +254,21 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     // En todos los casos el giro es amortiguado (SmoothDampAngle), nunca de golpe.
     private void HandleMovement()
     {
-        if (currentState == PlayerState.Rolling || currentState == PlayerState.Attacking)
+        // Atacando se puede caminar (más lento): el golpe lo hacen torso y brazos en la capa
+        // UpperBody del Animator, y las piernas siguen con la locomoción de abajo
+        bool attacking = currentState == PlayerState.Attacking;
+        if (currentState == PlayerState.Rolling || (attacking && !moveWhileAttacking))
             return;
 
         // Otros scripts pueden frenar al personaje (ej.: la lámpara alzada camina más lento y no corre)
-        Vector2 input = moveInput * MoveSpeedMultiplier;
+        Vector2 input = moveInput * MoveSpeedMultiplier * (attacking ? attackMoveSpeed : 1f);
 
         // Sin estamina no se corre: al llegar a 0 pasa a caminar hasta recuperar sprintRecoverStamina
         if (stats.CurrentStamina <= 0f)
             sprintExhausted = true;
         else if (sprintExhausted && stats.CurrentStamina >= sprintRecoverStamina)
             sprintExhausted = false;
-        bool running = isRunning && AllowRunning && !sprintExhausted;
+        bool running = !attacking && isRunning && AllowRunning && !sprintExhausted;
 
         // El input no pasa de 0 a 1 de golpe: acelera y frena de a poco (tiempos distintos)
         float smoothTime = input.sqrMagnitude >= smoothedInput.sqrMagnitude ? accelerationTime : decelerationTime;
@@ -304,12 +315,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 rb.MovePosition(rb.position + desiredVelocity * Time.fixedDeltaTime);
                 lastMoveSource = grounded ? "código" : "código (en el aire)";
             }
-            currentState = running ? PlayerState.Sprinting : PlayerState.Moving;
+            // Atacando, el estado sigue siendo Attacking: de eso dependen el combo y la recuperación
+            if (!attacking)
+                currentState = running ? PlayerState.Sprinting : PlayerState.Moving;
 
             if (running && hasInput)
                 stats.ConsumeStamina(stats.SprintStaminaCostPerSecond * Time.fixedDeltaTime);
         }
-        else
+        else if (!attacking)
         {
             currentState = PlayerState.Idle;
         }
@@ -333,8 +346,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public void ApplyRootMotion(Vector3 deltaPosition)
     {
         if (!useRootMotion) return;
+        // Atacando también, si se puede caminar atacando: las piernas son las de la locomoción
+        bool walkingAttack = currentState == PlayerState.Attacking && moveWhileAttacking;
         if (currentState != PlayerState.Idle && currentState != PlayerState.Moving &&
-            currentState != PlayerState.Sprinting && currentState != PlayerState.Blocking)
+            currentState != PlayerState.Sprinting && currentState != PlayerState.Blocking && !walkingAttack)
             return;
         if (!IsGrounded) return;
 
