@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65930b72eb1f4744da3d6cef73e3cda0, type: 3}
+  m_Name: Featherlight Rapier
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
+  itemName: Featherlight Rapier
+  description: So light it barely exists. Each strike is little more than a scratch, but it strikes faster than the eye can follow.
+  value: 80
+  weaponType: {fileID: 11400000, guid: 65c1159c79dd7891ac8cfb75c122f11e, type: 2}
+  damage: 5
+  weight: 0.5
+  modelPrefab: {fileID: 5883250425237761547, guid: 09a3c311c6be57f87ded10cb281f34a2, type: 3}

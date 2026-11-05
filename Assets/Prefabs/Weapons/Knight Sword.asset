@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Knight Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
   itemName: Knight Sword
-  description: The knight's trusty sword. Not too fast, not too slow, it has been through worse.
+  description: The knight's trusty sword. Not too fast, not too slow, it has been
+    through worse.
   value: 40
+  basicLoot: 0
   weaponType: {fileID: 11400000, guid: 734f7ed836f5cc249b28726bb8e49fd9, type: 2}
   damage: 12
   weight: 6

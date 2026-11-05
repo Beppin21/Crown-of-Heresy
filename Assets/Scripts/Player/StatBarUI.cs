@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 // Barra de vida o de estamina del jugador, estilo souls. Las arma sola PlayerStats al arrancar:
 // la de vida en el lugar donde estaba el texto de vida (que queda adentro mostrando "73 / 100") y
-// la de estamina justo arriba.
+// la de estamina justo arriba. El jefe usa la misma barra, más ancha y abajo (CreateBossBar).
 //
 //   - Al bajar el valor, el color baja al instante, pero la parte perdida queda marcada en un color
 //     claro ("chip") durante chipDelay segundos; después se va consumiendo hasta el valor real:
@@ -95,6 +95,56 @@ public class StatBarUI : MonoBehaviour
         Vector2 position = leftEdge + new Vector2(bar.size.x * health.pivot.x,
                                                   health.sizeDelta.y * (1f - health.pivot.y) + gap + bar.size.y * health.pivot.y);
         bar.Build(health.parent, health.GetSiblingIndex() + 1, health.anchorMin, health.anchorMax, health.pivot, position);
+        return bar;
+    }
+
+    // Barra de vida de un jefe: ancha, arriba al centro de la pantalla (abajo a la izquierda están
+    // las del jugador), con el nombre arriba y sin números. Va en un Canvas propio (la raíz de la
+    // barra), que se borra con la barra. Si se crea en 0 y después se llena, el color sube de a
+    // poco (la parte que "va a subir" es invisible), como cuando aparece un jefe.
+    public static StatBarUI CreateBossBar(string name, TMP_FontAsset font)
+    {
+        GameObject canvasObject = new GameObject("BossBarCanvas", typeof(Canvas), typeof(CanvasScaler));
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 10;
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        StatBarUI bar = CreateObject("BossBar");
+        bar.size = new Vector2(1100f, 22f);
+        bar.riseSpeed = 0.8f;          // se llena en algo más de un segundo
+        bar.riseColor = Color.clear;
+        bar.hitThreshold = 0.01f;
+        bar.shakeStrength = 3f;
+        bar.lowThreshold = 0f; // la del jefe no late
+        Vector2 topCenter = new Vector2(0.5f, 1f);
+        bar.Build(canvasObject.transform, 0, topCenter, topCenter, topCenter, new Vector2(0f, -80f));
+
+        // Nombre arriba de la barra, alineado a la izquierda: mayúsculas espaciadas con contorno
+        // negro, para que se lea sobre cualquier fondo
+        GameObject titleObject = new GameObject("BossName", typeof(RectTransform));
+        RectTransform titleRect = (RectTransform)titleObject.transform;
+        titleRect.SetParent(bar.rect, false);
+        titleRect.anchorMin = new Vector2(0f, 1f);
+        titleRect.anchorMax = new Vector2(1f, 1f);
+        titleRect.pivot = new Vector2(0f, 0f);
+        titleRect.anchoredPosition = new Vector2(0f, 6f);
+        titleRect.sizeDelta = new Vector2(0f, 50f);
+        TextMeshProUGUI title = titleObject.AddComponent<TextMeshProUGUI>();
+        if (font != null)
+            title.font = font;
+        title.fontSize = 38f;
+        title.fontStyle = FontStyles.UpperCase;
+        title.characterSpacing = 6f;
+        title.color = new Color(0.95f, 0.9f, 0.8f);
+        title.outlineWidth = 0.18f;
+        title.outlineColor = new Color32(0, 0, 0, 255);
+        title.alignment = TextAlignmentOptions.BottomLeft;
+        title.raycastTarget = false;
+        title.text = name;
         return bar;
     }
 
