@@ -112,7 +112,8 @@ public class ShopManager : MonoBehaviour
     private void Update()
     {
 #if UNITY_EDITOR
-        if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
+        // Con el inventario abierto encima, F9 es del inventario (da todos los objetos)
+        if (!InventoryUI.OpenNow && Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
         {
             InventoryUI.money += EditorMoneyCheat;
             ShowFeedback($"Editor: +${EditorMoneyCheat}", InventoryUI.GoldColor);

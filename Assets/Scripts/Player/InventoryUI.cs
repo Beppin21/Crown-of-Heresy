@@ -26,12 +26,23 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemListText;
     [SerializeField] private TextMeshProUGUI moneyDisplay;
 
+    // Lista desplazable (ver SetupScrolling)
+    private const float ScrollbarWidth = 8f;
+    private const float PanelMargin = 24f;  // la lista no se acerca más que esto al borde del panel
+    private const float ScrollStep = 90f;   // cuánto baja la lista por cada paso de la rueda
+    private ScrollRect scroll;
+    private RectTransform viewport;
+
     // Lista en memoria donde se guardan los datos de los objetos recogidos
     public static readonly List<LootData> inventory = new List<LootData>();
     public static int money = 0;
     private bool isOpen = false;
 
     public bool IsOpen => isOpen;
+
+    // Si el inventario está abierto, sin tener que buscar el componente (la tienda lo usa para que
+    // F9 lo atienda la ventana de arriba)
+    public static bool OpenNow { get; private set; }
 
     private void Start()
     {
@@ -65,6 +76,101 @@ public class InventoryUI : MonoBehaviour
             if (text == itemListText) continue;
             text.color = text == moneyDisplay ? GoldColor : TitleColor;
         }
+
+        SetupScrolling();
+    }
+
+    // Con muchos objetos el texto se salía del panel por abajo. Se lo mete en una ventana recortada
+    // (lo que ocupaba el texto, sin pasarse del panel) que se desplaza con la rueda del mouse, con
+    // una barra fina y dorada a la derecha que aparece solo cuando no entra todo. El texto crece
+    // con lo que tiene escrito (ContentSizeFitter). Se arma por código para no tocar el Canvas.
+    private void SetupScrolling()
+    {
+        if (itemListText == null || scroll != null) return;
+        RectTransform panel = inventoryPanel.transform as RectTransform;
+        RectTransform text = itemListText.rectTransform;
+        if (panel == null || text.parent == null) return;
+
+        // Lo que ocupa el texto, recortado al panel con un margen, en coordenadas del panel
+        Canvas.ForceUpdateCanvases();
+        Vector3[] corners = new Vector3[4];
+        text.GetWorldCorners(corners);
+        Rect area = panel.rect;
+        Vector2 min = Vector2.Max(panel.InverseTransformPoint(corners[0]), area.min + Vector2.one * PanelMargin);
+        Vector2 max = Vector2.Min(panel.InverseTransformPoint(corners[2]), area.max - Vector2.one * PanelMargin);
+        if (max.x - min.x < 50f || max.y - min.y < 50f) return; // sin lugar razonable: queda como estaba
+
+        GameObject viewObject = new GameObject("Lista", typeof(RectTransform), typeof(Image), typeof(RectMask2D), typeof(ScrollRect));
+        viewport = (RectTransform)viewObject.transform;
+        viewport.SetParent(panel, false);
+        viewport.SetSiblingIndex(text.GetSiblingIndex());
+        viewport.anchorMin = new Vector2((min.x - area.xMin) / area.width, (min.y - area.yMin) / area.height);
+        viewport.anchorMax = new Vector2((max.x - area.xMin) / area.width, (max.y - area.yMin) / area.height);
+        viewport.offsetMin = Vector2.zero;
+        viewport.offsetMax = Vector2.zero;
+        viewObject.GetComponent<Image>().color = Color.clear; // invisible: recibe el arrastre del mouse
+
+        // El texto arriba de todo, a lo ancho (menos el lugar de la barra) y del alto de lo que tiene
+        float gutter = ScrollbarWidth + 12f;
+        text.SetParent(viewport, false);
+        text.anchorMin = new Vector2(0f, 1f);
+        text.anchorMax = new Vector2(1f, 1f);
+        text.pivot = new Vector2(0.5f, 1f);
+        text.sizeDelta = new Vector2(-gutter, text.sizeDelta.y);
+        text.anchoredPosition = new Vector2(-gutter * 0.5f, 0f);
+        ContentSizeFitter fitter = itemListText.gameObject.AddComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        scroll = viewObject.GetComponent<ScrollRect>();
+        scroll.content = text;
+        scroll.viewport = viewport;
+        scroll.horizontal = false;
+        scroll.vertical = true;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.inertia = false;
+        scroll.scrollSensitivity = 0f; // la rueda la lee Update (funciona aunque la escena no tenga EventSystem)
+
+        GameObject barObject = new GameObject("Barra", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+        RectTransform bar = (RectTransform)barObject.transform;
+        bar.SetParent(viewport, false);
+        bar.anchorMin = new Vector2(1f, 0f);
+        bar.anchorMax = Vector2.one;
+        bar.pivot = new Vector2(1f, 0.5f);
+        bar.sizeDelta = new Vector2(ScrollbarWidth, 0f);
+        bar.anchoredPosition = Vector2.zero;
+        barObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
+
+        RectTransform track = new GameObject("Recorrido", typeof(RectTransform)).GetComponent<RectTransform>();
+        track.SetParent(bar, false);
+        track.anchorMin = Vector2.zero;
+        track.anchorMax = Vector2.one;
+        track.offsetMin = Vector2.zero;
+        track.offsetMax = Vector2.zero;
+
+        GameObject handleObject = new GameObject("Manija", typeof(RectTransform), typeof(Image));
+        RectTransform handle = (RectTransform)handleObject.transform;
+        handle.SetParent(track, false);
+        handle.offsetMin = Vector2.zero;
+        handle.offsetMax = Vector2.zero;
+        Image handleImage = handleObject.GetComponent<Image>();
+        handleImage.color = new Color(GoldColor.r, GoldColor.g, GoldColor.b, 0.85f);
+
+        Scrollbar scrollbar = barObject.GetComponent<Scrollbar>();
+        scrollbar.handleRect = handle;
+        scrollbar.targetGraphic = handleImage;
+        scrollbar.direction = Scrollbar.Direction.BottomToTop;
+        scroll.verticalScrollbar = scrollbar;
+        scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+    }
+
+    // Un paso de la rueda: arriba (+) sube la lista, abajo (-) la baja
+    private void ScrollList(float wheel)
+    {
+        if (scroll == null || wheel == 0f) return;
+        float overflow = scroll.content.rect.height - viewport.rect.height;
+        if (overflow <= 0f) return;
+        scroll.verticalNormalizedPosition = Mathf.Clamp01(scroll.verticalNormalizedPosition + Mathf.Sign(wheel) * ScrollStep / overflow);
     }
 
     private void Update()
@@ -74,9 +180,19 @@ public class InventoryUI : MonoBehaviour
             ToggleInventory();
         }
 
+#if UNITY_EDITOR
+        // F9 con el inventario abierto, solo en el Editor: todos los objetos del juego, para probar
+        if (isOpen && Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame)
+            GiveAllItemsForTesting();
+#endif
+
         // Clic sobre "Equip" / "Unequip" de un arma (son links del texto de la lista)
         if (isOpen && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             HandleClick(Mouse.current.position.ReadValue());
+
+        // Rueda del mouse: desplaza la lista cuando no entra en el panel
+        if (isOpen && Mouse.current != null)
+            ScrollList(Mouse.current.scroll.ReadValue().y);
     }
 
     // El toggle lo dispara PlayerController.OnInventary (acción "inventary" del Input System,
@@ -84,6 +200,7 @@ public class InventoryUI : MonoBehaviour
     public void ToggleInventory()
     {
         isOpen = !isOpen;
+        OpenNow = isOpen;
         inventoryPanel.SetActive(isOpen);
         if (isOpen)
             inventoryPanel.transform.SetAsLastSibling(); // arriba de la tienda, si está abierta en el mismo Canvas
@@ -93,8 +210,44 @@ public class InventoryUI : MonoBehaviour
         Cursor.visible = isOpen;
 
         if (isOpen)
+        {
             UpdateUI();
+            if (scroll != null)
+            {
+                Canvas.ForceUpdateCanvases();
+                scroll.verticalNormalizedPosition = 1f; // arranca desde arriba
+            }
+        }
     }
+
+    // Al cambiar de escena con el inventario abierto, que no quede marcado como abierto
+    private void OnDisable()
+    {
+        if (isOpen) OpenNow = false;
+    }
+
+#if UNITY_EDITOR
+    // Todas las armas que falten (una de cada) y uno más de cada objeto que no es arma (la llave, el
+    // Magic Cube...). Busca los LootData del proyecto, así que entra cualquiera que se agregue después.
+    private void GiveAllItemsForTesting()
+    {
+        List<string> added = new List<string>();
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:LootData", new[] { "Assets" }))
+        {
+            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+            if (path.Contains("/_Recovery/")) continue;
+            LootData item = UnityEditor.AssetDatabase.LoadAssetAtPath<LootData>(path);
+            if (item == null || (item is WeaponSO && inventory.Contains(item))) continue;
+            inventory.Add(item);
+            added.Add(item.ItemName);
+        }
+
+        Debug.Log(added.Count > 0
+            ? $"[InventoryUI] Editor (F9): {string.Join(", ", added)}."
+            : "[InventoryUI] Editor (F9): no había nada nuevo para agregar.");
+        UpdateUI();
+    }
+#endif
 
     // Método que llamará el objeto de loot al ser recogido
     public void AddItem(LootData item)
@@ -213,6 +366,8 @@ public class InventoryUI : MonoBehaviour
         UnityEngine.Camera uiCamera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
             ? canvas.worldCamera
             : null;
+        // La parte de la lista que quedó fuera de la ventana no se ve: ahí no se puede hacer clic
+        if (viewport != null && !RectTransformUtility.RectangleContainsScreenPoint(viewport, screenPosition, uiCamera)) return;
         int link = TMP_TextUtilities.FindIntersectingLink(itemListText, screenPosition, uiCamera);
         if (link < 0) return;
 

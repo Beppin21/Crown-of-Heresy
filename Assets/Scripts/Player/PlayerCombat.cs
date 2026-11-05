@@ -92,7 +92,14 @@ public class PlayerCombat : MonoBehaviour
              "no cuando se acomoda. La consola muestra la velocidad máxima de cada golpe para ajustarla.")]
     [SerializeField] private float minBladeSpeed = 2.5f;
 
-    private const int SweepSteps = 4;
+    // Entre dos pasos de física la caja se prueba en varias poses intermedias: tantas como hagan
+    // falta para que la punta no avance más de SweepSpacing entre una y otra (un arma muy rápida,
+    // como el estoque a x2.7, recorre más de 1 m por paso). Para la prueba la caja tiene al menos
+    // MinSweepHalfThickness de medio espesor, así una hoja muy fina no pasa entre dos poses.
+    private const int MinSweepSteps = 4;
+    private const int MaxSweepSteps = 40;
+    private const float SweepSpacing = 0.1f;
+    private const float MinSweepHalfThickness = 0.06f;
     private readonly Collider[] overlapBuffer = new Collider[16];
     private bool swingActive;
     private float swingStartTime;
@@ -326,7 +333,10 @@ public class PlayerCombat : MonoBehaviour
     // Durante la ventana del golpe, revisa en cada paso de física qué toca la caja del hitbox.
     // Solo cuenta si la hoja se mueve al menos a minBladeSpeed (cuando corta de verdad, no cuando
     // se acomoda). La caja se prueba en varias posiciones entre el paso anterior y este, así un
-    // corte rápido no "atraviesa" al enemigo sin tocarlo.
+    // corte rápido no "atraviesa" al enemigo sin tocarlo. Las posiciones intermedias siguen el
+    // arco del corte (ArcLerp), no la recta entre las dos poses: con un arma rápida la hoja gira
+    // decenas de grados por paso y la recta pasaba por adentro del arco, más cerca del jugador
+    // (el tercer golpe del estoque no conectaba nunca).
     private void FixedUpdate()
     {
         if (!swingActive) return;
@@ -352,12 +362,16 @@ public class PlayerCombat : MonoBehaviour
             maxBladeSpeed = Mathf.Max(maxBladeSpeed, bladeSpeed);
             if (bladeSpeed >= minBladeSpeed)
             {
-                for (int step = 1; step <= SweepSteps; step++)
+                Vector3 sweepExtents = Vector3.Max(halfExtents, Vector3.one * MinSweepHalfThickness);
+                float turnRadians = Quaternion.Angle(lastBladeRotation, rotation) * Mathf.Deg2Rad;
+                float tipTravel = Vector3.Distance(center, lastBladeCenter) + turnRadians * halfExtents.magnitude;
+                int steps = Mathf.Clamp(Mathf.CeilToInt(tipTravel / SweepSpacing), MinSweepSteps, MaxSweepSteps);
+                for (int step = 1; step <= steps; step++)
                 {
-                    float k = step / (float)SweepSteps;
-                    int count = Physics.OverlapBoxNonAlloc(Vector3.Lerp(lastBladeCenter, center, k), halfExtents, overlapBuffer,
-                                                           Quaternion.Slerp(lastBladeRotation, rotation, k), hittableLayers,
-                                                           QueryTriggerInteraction.Ignore);
+                    ArcLerp(lastBladeCenter, lastBladeRotation, center, rotation, step / (float)steps,
+                            out Vector3 stepCenter, out Quaternion stepRotation);
+                    int count = Physics.OverlapBoxNonAlloc(stepCenter, sweepExtents, overlapBuffer, stepRotation,
+                                                           hittableLayers, QueryTriggerInteraction.Ignore);
                     for (int i = 0; i < count; i++)
                         HandleHitboxHit(overlapBuffer[i]);
                 }
@@ -367,6 +381,35 @@ public class PlayerCombat : MonoBehaviour
         lastBladeCenter = center;
         lastBladeRotation = rotation;
         hasLastBladePose = true;
+    }
+
+    // Pose intermedia (k de 0 a 1) entre dos poses de la caja, tomando el movimiento como un giro
+    // alrededor de un eje (más un avance a lo largo de él): así el centro recorre el arco del corte.
+    // El eje sale de las dos poses: el movimiento rígido es x -> delta·x + t, y el punto del eje es
+    // p = (u + cot(θ/2)·(eje × u)) / 2, con u la parte de t perpendicular al eje. Si el giro es
+    // chico, o algo no cierra, se usa la recta.
+    private static void ArcLerp(Vector3 fromCenter, Quaternion fromRotation, Vector3 toCenter, Quaternion toRotation,
+                                float k, out Vector3 center, out Quaternion rotation)
+    {
+        rotation = Quaternion.Slerp(fromRotation, toRotation, k);
+        center = Vector3.Lerp(fromCenter, toCenter, k);
+
+        Quaternion delta = toRotation * Quaternion.Inverse(fromRotation);
+        delta.ToAngleAxis(out float angle, out Vector3 axis);
+        if (angle > 180f) angle -= 360f;
+        if (Mathf.Abs(angle) < 2f || axis.sqrMagnitude < 0.5f || float.IsNaN(axis.x)) return;
+        axis.Normalize();
+
+        Vector3 translation = toCenter - delta * fromCenter;
+        Vector3 along = Vector3.Dot(translation, axis) * axis;
+        Vector3 across = translation - along;
+        Vector3 pivot = 0.5f * (across + Vector3.Cross(axis, across) / Mathf.Tan(angle * 0.5f * Mathf.Deg2Rad));
+
+        // Comprobación: con k = 1 tiene que dar la pose final
+        Vector3 end = pivot + delta * (fromCenter - pivot) + along;
+        if ((end - toCenter).sqrMagnitude > 0.0025f) return;
+
+        center = pivot + Quaternion.AngleAxis(angle * k, axis) * (fromCenter - pivot) + along * k;
     }
 
     // Se ejecuta cuando el golpe toca algo (por la revisión de FixedUpdate o, con un hitbox que no
