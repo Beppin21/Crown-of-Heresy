@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyHitbox : MonoBehaviour
 {
     [SerializeField] private EnemyDasher enemyDasher;
+    [SerializeField] private BaseEnemy baseEnemy; // Usá este o el de arriba, según el script que tenga el enemigo
     [SerializeField] private float damage = 20f;
 
     private void OnTriggerEnter(Collider other)
@@ -20,7 +21,8 @@ public class EnemyHitbox : MonoBehaviour
             PlayerCombat playerCombat = other.GetComponentInParent<PlayerCombat>();
             if (playerCombat != null)
             {
-                GameObject attacker = enemyDasher != null ? enemyDasher.gameObject : gameObject;
+                GameObject attacker = enemyDasher != null ? enemyDasher.gameObject
+                                    : baseEnemy != null ? baseEnemy.gameObject : gameObject;
                 finalDamage = playerCombat.TryDefend(attacker, damage, damage);
             }
 
@@ -31,6 +33,10 @@ public class EnemyHitbox : MonoBehaviour
             if (enemyDasher != null)
             {
                 enemyDasher.InterruptDash();
+            }
+            if (baseEnemy != null)
+            {
+                baseEnemy.InterruptDash();
             }
         }
     }
