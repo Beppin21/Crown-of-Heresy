@@ -1,0 +1,9 @@
+Masked Character - Regulator (A2555), Sketchfab
+https://sketchfab.com/3d-models/masked-character-985c16043c4241b6af5dfdc4b2b03653
+Licencia: Sketchfab Free Standard. El autor permite usarlo en cualquier proyecto sin dar credito.
+Descargado el 2026-11-04.
+
+source/Mask.fbx y textures/ son los archivos originales.
+MaskedCharacter.fbx es el mismo modelo con el esqueleto de Mixamo (auto-rigger), a partir de un
+OBJ limpio (escala aplicada, 1.8 m, pies en el piso) porque Mixamo no aceptaba el FBX original.
+Material_008_mask.png y "Masked Character.mat" los arma Scripts/Editor/EnemyModelSetup.cs.
