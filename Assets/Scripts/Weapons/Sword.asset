@@ -22,3 +22,5 @@ MonoBehaviour:
   minSpeedMultiplier: 0.6
   lightRecoveryTime: 0.05
   heavyRecoveryTime: 0.6
+  lightStaminaMultiplier: 0.4
+  heavyStaminaMultiplier: 2.2

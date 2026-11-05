@@ -561,7 +561,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaRegenPerSecond: 15
   staminaRegenDelay: 1
-  SprintStaminaCostPerSecond: 12
+  SprintStaminaCostPerSecond: 5
   maxPoise: 40
   souls: 0
 --- !u!114 &8130316287833298783
@@ -604,9 +604,7 @@ MonoBehaviour:
     animationLength: 2.7
   comboResetTime: 1.2
   defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
-  startingWeapons:
-  - {fileID: 11400000, guid: 5324757ac58f811468768c0f3c155175, type: 2}
-  - {fileID: 11400000, guid: 86142d8b9c7b3d047897657f5ca1a89f, type: 2}
+  startingWeapons: []
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5
@@ -675,7 +673,7 @@ MonoBehaviour:
   rollSpeed: 7
   iFrameStart: 0.05
   iFrameEnd: 0.35
-  rollStaminaCost: 20
+  rollStaminaCost: 16
   lockOnRadius: 15
   enemyLayer:
     serializedVersion: 2
