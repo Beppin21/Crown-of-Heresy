@@ -282,6 +282,7 @@ public class ShopManager : MonoBehaviour
         if (InventoryUI.money < item.Value)
         {
             ShowFeedback($"Not enough money: you need ${item.Value - InventoryUI.money} more.", ErrorColor);
+            if (DialogosTienda.Instancia != null) DialogosTienda.Instancia.AlNoAlcanzar();
             return;
         }
 
@@ -289,6 +290,7 @@ public class ShopManager : MonoBehaviour
         staticShopStock.Remove(item);
         InventoryUI.inventory.Add(item);
         Debug.Log($"[Tienda] Compraste '{item.ItemName}' por ${item.Value}. Te quedan ${InventoryUI.money}.");
+        if (DialogosTienda.Instancia != null) DialogosTienda.Instancia.AlComprar();
 
         // Un arma comprada se equipa si queda un lugar libre (si no, se equipa desde el inventario)
         string message = $"Bought {item.ItemName}.";

@@ -81,6 +81,26 @@ public class PlayerCombat : MonoBehaviour
     private static int activeSlot;
     private static bool startingWeaponsGiven; // las armas iniciales se dan una sola vez por partida
 
+    // Para el guardado (SaveSystem): qué hay equipado, cuál en la mano, y volver a ponerlo al cargar
+    public static WeaponSO[] SavedEquippedSlots => (WeaponSO[])equippedSlots.Clone();
+    public static int SavedActiveSlot => activeSlot;
+
+    public static void RestoreEquipment(WeaponSO[] slots, int active)
+    {
+        for (int i = 0; i < MaxEquipped; i++)
+            equippedSlots[i] = slots != null && i < slots.Length ? slots[i] : null;
+        activeSlot = Mathf.Clamp(active, 0, MaxEquipped - 1);
+        startingWeaponsGiven = true; // el inventario cargado ya trae las armas
+    }
+
+    // Partida nueva: sin armas equipadas; el personaje recibe otra vez las iniciales
+    public static void ResetEquipment()
+    {
+        for (int i = 0; i < MaxEquipped; i++) equippedSlots[i] = null;
+        activeSlot = 0;
+        startingWeaponsGiven = false;
+    }
+
     private readonly HashSet<IDamageable> enemiesHitThisSwing = new HashSet<IDamageable>();
 
     [Header("Detección del golpe")]

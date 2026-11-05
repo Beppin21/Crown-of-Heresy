@@ -9,8 +9,9 @@ using UnityEngine.UI;
 // Tools > Jefe > Armar pelea del jefe.
 //
 //   - Espera quieto hasta que el jugador se acerca a menos de aggroRadius (o le pega). Ahí aparece
-//     la barra de vida arriba de la pantalla y se arma el punto de reaparición de la entrada
-//     (BossRespawnPoint): si el jugador muere, vuelve ahí y no al principio del Dungeon.
+//     la barra de vida arriba de la pantalla. Si el jugador muere, va a la pantalla de derrota, y Try
+//     Again lo lleva a la última hoguera (hay una justo afuera de la sala), como en el resto del
+//     juego: ya no se arma BossRespawnPoint.
 //   - Cada fase tiene su propia vida y su propia barra, que se llena al aparecer.
 //   - Fase 1, el esqueleto de las manos flotantes: manotazo (BossArmSlam) y rayos del halo
 //     (BossHaloBolts).
@@ -311,7 +312,6 @@ public class BossController : MonoBehaviour
     {
         if (state != State.Waiting) return;
         state = State.PhaseOne;
-        BossRespawnPoint.Arm(gameObject.scene.name);
         ShowBar(phaseOneName, phaseOneHealth);
         loopRoutine = StartCoroutine(AttackLoop());
         Log("Empieza la pelea.");
