@@ -63,15 +63,22 @@ AudioMixerController:
   m_MasterGroup: {fileID: 24300002}
   m_Snapshots:
   - {fileID: 24500006}
+  - {fileID: 101084675388123139}
+  - {fileID: 106379049343880180}
   m_StartSnapshot: {fileID: 24500006}
-  m_SuspendThreshold: 0
+  m_SuspendThreshold: -80
   m_EnableSuspend: 1
   m_UpdateMode: 0
-  m_ExposedParameters: []
+  m_ExposedParameters:
+  - guid: 008e4f41cb407e6489413c605a8d9b34
+    name: VolumenMusica
   m_AudioMixerGroupViews:
   - guids:
     - df78fdde652290443b5c7673862edb9e
     - d0e39f6db093872488549d833e966747
+    - 9c87af4387c6d528f3d4ea40485db65b
+    - 0b3bb6ecd3283b773d769f3a04c89fea
+    - 90fe90784e5549d7c158d9e4bd043893
     - 0c8e3f2597187284eb61113098bac4ab
     - 0ae5c68865ec01f43a404fea11167abf
     - 776f80eed63d8bb4c854b6ae653398fa
@@ -121,26 +128,149 @@ AudioMixerSnapshotController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Snapshot
+  m_Name: Normal
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 921aec302a290ea4ab5f5a097888b33e
   m_FloatValues:
-    50a47911973e7f64b874379fcf284592: 0.01
-    008e4f41cb407e6489413c605a8d9b34: 20
-    d499dad678ee6f94baf428e993374ff1: -3.5090396
-    8487cf7acc74205409f2190384af2238: 6.2251854
-    b2ec313eff352524a92b4cfee2eeb44f: -4.1973577
+    008e4f41cb407e6489413c605a8d9b34: -6
+    1fc51264cad39e964dbc447e7330f76e: -50
+    d499dad678ee6f94baf428e993374ff1: 0
+    226ae6a9aa52b6b3882c9d7b3165e441: -50
+    8487cf7acc74205409f2190384af2238: -2
+    b2ec313eff352524a92b4cfee2eeb44f: -6
+    7c71646e97826c5697b8f185a03e6a18: 0
   m_TransitionOverrides: {}
---- !u!244 &1683685665391510683
+--- !u!243 &100597497174248408
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Fuego
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 0b3bb6ecd3283b773d769f3a04c89fea
+  m_Children: []
+  m_Volume: 1fc51264cad39e964dbc447e7330f76e
+  m_Pitch: 35a6a1a9889226fdd9fcba09019046f3
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 113635136050048473}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!243 &100729605598402564
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Normal
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 9c87af4387c6d528f3d4ea40485db65b
+  m_Children: []
+  m_Volume: 7c71646e97826c5697b8f185a03e6a18
+  m_Pitch: 9bb62ed53788dc05f2eae9083915ee7a
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 121995342514848656}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!245 &101084675388123139
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Fuego
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: ecae50a9f8d87cd38b892ba7a0aec864
+  m_FloatValues:
+    008e4f41cb407e6489413c605a8d9b34: -6
+    1fc51264cad39e964dbc447e7330f76e: 0
+    d499dad678ee6f94baf428e993374ff1: 0
+    226ae6a9aa52b6b3882c9d7b3165e441: -50
+    8487cf7acc74205409f2190384af2238: -2
+    b2ec313eff352524a92b4cfee2eeb44f: -3
+    7c71646e97826c5697b8f185a03e6a18: -50
+  m_TransitionOverrides: {}
+--- !u!245 &106379049343880180
+AudioMixerSnapshotController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Tienda
+  m_AudioMixer: {fileID: 24100000}
+  m_SnapshotID: 3f1a9c0e7b2d4e85a6c19d0f42b8e731
+  m_FloatValues:
+    008e4f41cb407e6489413c605a8d9b34: -6
+    1fc51264cad39e964dbc447e7330f76e: -50
+    d499dad678ee6f94baf428e993374ff1: 0
+    226ae6a9aa52b6b3882c9d7b3165e441: 20
+    8487cf7acc74205409f2190384af2238: -2
+    b2ec313eff352524a92b4cfee2eeb44f: -14
+    7c71646e97826c5697b8f185a03e6a18: -50
+  m_TransitionOverrides: {}
+--- !u!244 &113635136050048473
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_EffectID: bd86229c032041048bc10e3e6c8d50f5
-  m_EffectName: Send
-  m_MixLevel: b7afa2ed7cf09c84780be6a9e0533438
+  m_EffectID: 1dd80d677117740d2f0c4058cd64dcee
+  m_EffectName: Attenuation
+  m_MixLevel: 4cefba803ff5b2fd6b2f902a69196fcf
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!243 &118864514034091616
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Tienda
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 90fe90784e5549d7c158d9e4bd043893
+  m_Children: []
+  m_Volume: 226ae6a9aa52b6b3882c9d7b3165e441
+  m_Pitch: 4da47c103914333742776b069e0b6872
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 145860407737244359}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &121995342514848656
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: b2782ddfb07bbc7e65f825199bd5b03c
+  m_EffectName: Attenuation
+  m_MixLevel: 97b06488a23a39fa6a06bbcba57cc5e1
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!244 &145860407737244359
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 5e8af9bd3f956f9ffa0287ca955ee725
+  m_EffectName: Attenuation
+  m_MixLevel: 0d38231ed7fc62eadff3bd3b75e84850
   m_Parameters: []
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
@@ -215,7 +345,10 @@ AudioMixerGroupController:
   m_Name: Musica
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: d0e39f6db093872488549d833e966747
-  m_Children: []
+  m_Children:
+  - {fileID: 100729605598402564}
+  - {fileID: 100597497174248408}
+  - {fileID: 118864514034091616}
   m_Volume: 008e4f41cb407e6489413c605a8d9b34
   m_Pitch: 50a47911973e7f64b874379fcf284592
   m_Send: 00000000000000000000000000000000

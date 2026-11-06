@@ -15303,7 +15303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee5a25a894fe9804997ca894e5e19c57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogosTienda
-  grupoVoz: {fileID: 0}
+  grupoVoz: {fileID: 3054774787601070186, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
   bienvenida: {fileID: 8300000, guid: 3050c9074aa6c9943ad5b0e304da5fd7, type: 3}
   abrir:
   - {fileID: 8300000, guid: 09e91c55a9d8a164e834d006a11c3882, type: 3}
@@ -15341,7 +15341,7 @@ AudioSource:
   m_GameObject: {fileID: 610364204}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 3054774787601070186, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -22160,19 +22160,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.5946488
+      value: -0.59477144
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.030454472
+      value: -0.030460747
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.802357
+      value: -0.8022661
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.041092087
+      value: 0.041087423
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22188,19 +22188,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.59464884
+      value: -0.59477144
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.030454466
+      value: -0.030460747
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.8023571
+      value: -0.8022661
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.04109208
+      value: 0.041087423
       objectReference: {fileID: 0}
     - target: {fileID: 2597002262844181907, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: near clip plane
@@ -37437,6 +37437,76 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1727960629
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1727960631}
+  - component: {fileID: 1727960630}
+  m_Layer: 0
+  m_Name: Musica del Pueblo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1727960630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727960629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee5e39445aba28c4bb81f7fec526ac04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicaPueblo
+  musicaNormal: {fileID: 8300000, guid: b4c1b08b5f6ed4147905ed341067bd80, type: 3}
+  musicaFuego: {fileID: 8300000, guid: f2f60eccc0c620e4db242f794ead707f, type: 3}
+  musicaTienda: {fileID: 8300000, guid: dd6048f13f7d03c478ba6fd97c351af1, type: 3}
+  volumen: 0.8
+  grupoMusica: {fileID: 9024849788322720481, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  grupoNormal: {fileID: 100729605598402564, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  grupoFuego: {fileID: 100597497174248408, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  grupoTienda: {fileID: 118864514034091616, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  snapshotNormal: {fileID: 24500006, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  snapshotFuego: {fileID: 101084675388123139, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  snapshotTienda: {fileID: 106379049343880180, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  aTienda: 1.5
+  aFuego: 4
+  aNormal: 3
+  fuegos: []
+  nombresFuegos:
+  - Fire_House
+  - Fire_Windmill
+  radioEntrada: 18
+  radioSalida: 22
+  mixer: {fileID: 24100000, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  parametroVolumen: VolumenMusica
+  volumenConVoz: 0.3
+  segundosBajar: 0.25
+  segundosSubir: 1.2
+  logs: 1
+--- !u!4 &1727960631
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727960629}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1731315274
 GameObject:
   m_ObjectHideFlags: 0
@@ -41005,3 +41075,4 @@ SceneRoots:
   - {fileID: 1189512731}
   - {fileID: 361574342}
   - {fileID: 412605971}
+  - {fileID: 1727960631}

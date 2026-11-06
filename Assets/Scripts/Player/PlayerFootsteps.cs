@@ -16,6 +16,8 @@ public class PlayerFootsteps : MonoBehaviour
     [SerializeField] private AudioClip[] footstepClips;
     [SerializeField] private AudioClip landingClip;
     [Range(0f, 1f)] [SerializeField] private float volume = 0.3f;
+    [Tooltip("Grupo del Audio Mixer (SFX). Lo asigna solo Scripts/Editor/AudioMixerSetup.cs.")]
+    [SerializeField] private UnityEngine.Audio.AudioMixerGroup outputGroup;
 
     [Header("Pasos por los pies")]
     [Tooltip("Tildado: los pasos salen de los pies del Avatar (sirve con cualquier animación). Destildado: de los eventos OnFootstep de las animaciones.")]
@@ -98,7 +100,7 @@ public class PlayerFootsteps : MonoBehaviour
         if (footstepClips == null || footstepClips.Length == 0) return;
         AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
         if (clip != null)
-            AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+            PlayAt(clip);
     }
 
     // Como las animaciones se mezclan (blend tree), varias pueden disparar el mismo evento a la
@@ -114,6 +116,21 @@ public class PlayerFootsteps : MonoBehaviour
     {
         if (animationEvent.animatorClipInfo.weight <= 0.5f) return;
         if (landingClip != null)
-            AudioSource.PlayClipAtPoint(landingClip, transform.position, volume);
+            PlayAt(landingClip);
+    }
+
+    // Como AudioSource.PlayClipAtPoint, pero saliendo por el grupo del mixer (PlayClipAtPoint no
+    // deja elegir la salida): una fuente 3D temporal en el lugar del paso
+    private void PlayAt(AudioClip clip)
+    {
+        GameObject sound = new GameObject("Paso");
+        sound.transform.position = transform.position;
+        AudioSource source = sound.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.volume = volume;
+        source.spatialBlend = 1f;
+        source.outputAudioMixerGroup = outputGroup;
+        source.Play();
+        Destroy(sound, clip.length + 0.1f);
     }
 }

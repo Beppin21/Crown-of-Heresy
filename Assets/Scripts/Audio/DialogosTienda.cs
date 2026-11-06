@@ -13,6 +13,9 @@ public class DialogosTienda : MonoBehaviour
 {
     public static DialogosTienda Instancia { get; private set; }
 
+    // Si la mercader está hablando ahora (MusicaPueblo baja la música mientras tanto)
+    public bool Hablando => fuente != null && fuente.isPlaying;
+
     [Header("Salida (el grupo Voz del mixer, cuando esté)")]
     [SerializeField] private AudioMixerGroup grupoVoz;
 
@@ -104,7 +107,10 @@ public class DialogosTienda : MonoBehaviour
 
 #if UNITY_EDITOR
     // Al agregar el componente (o con Reset en su menú) carga los clips de Assets/Audio/Dialogos por nombre
-    private void Reset()
+    private void Reset() => CargarClips();
+
+    // También la usa Scripts/Editor/AudioMixerSetup.cs al armar Town
+    public void CargarClips()
     {
         AudioClip[] saludo = Cargar("Bienvenida");
         bienvenida = saludo.Length > 0 ? saludo[0] : null;

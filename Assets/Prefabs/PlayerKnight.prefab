@@ -605,9 +605,13 @@ MonoBehaviour:
   comboResetTime: 1.2
   defaultWeapon: {fileID: 11400000, guid: f930ab7f3215a4e1d7718af0cb234af2, type: 2}
   startingWeapons: []
+  swingWindowStart: 0.1
+  swingWindowEnd: 0.85
+  minBladeSpeed: 2.5
   parryWindowDuration: 0.3
   blockDamageReduction: 0.8
   blockStaminaCostMultiplier: 0.5
+  debugLogs: 1
 --- !u!114 &7812464602763789418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,6 +661,8 @@ MonoBehaviour:
   runSpeed: 5.5
   accelerationTime: 0.25
   decelerationTime: 0.2
+  moveWhileAttacking: 1
+  attackMoveSpeed: 0.5
   turnSmoothTime: 0.18
   maxTurnSpeedWalking: 200
   maxTurnSpeedRunning: 360
@@ -667,13 +673,14 @@ MonoBehaviour:
     m_Bits: 4294967295
   groundCheckRadius: 0.25
   groundCheckOffset: 0.1
-  deathSceneName: Dungeon
+  defeatSceneName: MainDefeat
   deathReloadDelay: 3
   rollDuration: 0.6
   rollSpeed: 7
   iFrameStart: 0.05
   iFrameEnd: 0.35
   rollStaminaCost: 16
+  sprintRecoverStamina: 25
   lockOnRadius: 15
   enemyLayer:
     serializedVersion: 2
@@ -700,6 +707,11 @@ MonoBehaviour:
   drawShowAt: 0.35
   sheatheDuration: 1.2666668
   sheatheHideAt: 0.65
+  attackTilt: 1
+  attackTiltTargetAngle: 20
+  attackTiltMaxAngle: 45
+  attackTiltBlendTime: 0.08
+  logAttackTilt: 1
   debugLogs: 0
 --- !u!1 &323001746622601999
 GameObject:
@@ -2913,6 +2925,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   landingClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   volume: 0.3
+  outputGroup: {fileID: -1579257405215090993, guid: 85e246b60bce97049a76b097ab3fc61d, type: 2}
+  detectFootfalls: 1
+  liftHeight: 0.07
+  plantHeight: 0.03
+  minSpeed: 0.5
 --- !u!114 &1902941974525614730
 MonoBehaviour:
   m_ObjectHideFlags: 0
