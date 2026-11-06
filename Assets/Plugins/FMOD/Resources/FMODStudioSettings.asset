@@ -524,10 +524,10 @@ MonoBehaviour:
   m_Name: FMODStudioSettings
   m_EditorClassIdentifier: FMODUnity::FMODUnity.Settings
   switchSettingsMigration: 1
-  HasSourceProject: 1
-  HasPlatforms: 1
-  sourceProjectPath: ../../Crown-of-Heresy/Crown-of-Heresy.fspro
-  sourceBankPath: ../../Crown-of-Heresy/Build
+  HasSourceProject: 0
+  HasPlatforms: 0
+  sourceProjectPath: ../../Crown-of-Heresy-Fmod-Project/Crown-of-Heresy.fspro
+  sourceBankPath: Assets/StreamingAssets/Desktop
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1

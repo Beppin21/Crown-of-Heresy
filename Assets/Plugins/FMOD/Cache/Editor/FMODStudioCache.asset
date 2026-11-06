@@ -27,6 +27,111 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 81264
+--- !u!114 &-8783515594212397321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Event_Juego/EstadoJuego
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: EstadoJuego
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1148021602
+    data2: 273674942
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-8483001260991839848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Wind Bells SFX
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Wind Bells SFX
+  Guid:
+    Data1: -35949198
+    Data2: 1074160067
+    Data3: 2093676948
+    Data4: 1691498667
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 11520
+--- !u!114 &-7928678850124282007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Burning Windmill
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Burning Windmill
+  Guid:
+    Data1: 1140724495
+    Data2: 1185550089
+    Data3: 1246601873
+    Data4: 1556746533
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 9983
+--- !u!114 &-7865935005386343725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Sonido para los enemigos
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/Sonido para los enemigos
+  Guid:
+    Data1: -1484122304
+    Data2: 1195673654
+    Data3: 2113824904
+    Data4: 638708615
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-7346824647098572865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,6 +152,33 @@ MonoBehaviour:
     Data4: 1556746533
   Banks:
   - {fileID: -574983459096196582}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 9983
+--- !u!114 &-7294717224834982736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Burning House SFX
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Burning House SFX
+  Guid:
+    Data1: -2024318900
+    Data2: 1263093885
+    Data3: 798577060
+    Data4: 1110085315
+  Banks:
+  - {fileID: -2621528163172788261}
   IsStream: 0
   Is3D: 1
   IsOneShot: 0
@@ -108,6 +240,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 110064
+--- !u!114 &-6376953654194573210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Burning House
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Burning House
+  Guid:
+    Data1: -2024318900
+    Data2: 1263093885
+    Data3: 798577060
+    Data4: 1110085315
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 9983
 --- !u!114 &-6276079292989105490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,6 +294,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 9983
+--- !u!114 &-6072540871100156226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Dripping Well
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Dripping Well
+  Guid:
+    Data1: -519689457
+    Data2: 1336299858
+    Data3: 1415556528
+    Data4: -535934022
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 4224
 --- !u!114 &-5826997796303280721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,6 +368,33 @@ MonoBehaviour:
   - Name: Desktop
     Value: 2537408
   Exists: 1
+--- !u!114 &-4851692169539819082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Town Wind Loop
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Town Wind Loop
+  Guid:
+    Data1: -355782615
+    Data2: 1220206261
+    Data3: 1172039865
+    Data4: 1263030538
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 110064
 --- !u!114 &-4539392947864876985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,6 +422,78 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 4224
+--- !u!114 &-4173245328923776037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/monedas
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/monedas
+  Guid:
+    Data1: 625336516
+    Data2: 1285536193
+    Data3: -101223038
+    Data4: -1985677947
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-2895550925211027725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Windmill
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Windmill
+  Guid:
+    Data1: -1021119898
+    Data2: 1274035519
+    Data3: 509579411
+    Data4: -1265500564
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 81264
+--- !u!114 &-2621528163172788261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: Assets/StreamingAssets/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 639295091412222653
+  FileSizes: []
+  Exists: 1
 --- !u!114 &-2381110624340691414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303,6 +588,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 11520
+--- !u!114 &-842341838002222045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/SFX_Fogata
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/SFX_Fogata
+  Guid:
+    Data1: 1188506917
+    Data2: 1209356435
+    Data3: -2124924030
+    Data4: 1594171296
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-574983459096196582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,6 +655,33 @@ MonoBehaviour:
   - Name: Desktop
     Value: 2537408
   Exists: 1
+--- !u!114 &-226261303075894000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Burning Windmill SFX
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Burning Windmill SFX
+  Guid:
+    Data1: 1140724495
+    Data2: 1185550089
+    Data3: 1246601873
+    Data4: 1556746533
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 9983
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,38 +695,140 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
   EditorBanks:
-  - {fileID: 1731552180590735176}
-  - {fileID: -574983459096196582}
+  - {fileID: 6122914274757880781}
+  - {fileID: -2621528163172788261}
   EditorEvents:
-  - {fileID: -7346824647098572865}
-  - {fileID: 1411853284319631805}
-  - {fileID: 4290638518959603250}
-  - {fileID: -5826997796303280721}
-  - {fileID: 8706372054079276298}
-  - {fileID: 5705722436382539708}
-  - {fileID: 4310695798573691774}
+  - {fileID: 7270803061898760737}
+  - {fileID: -226261303075894000}
+  - {fileID: 756456858929091261}
+  - {fileID: 3862577845575857961}
+  - {fileID: 4708610604748805721}
+  - {fileID: -842341838002222045}
+  - {fileID: 6437191369899242765}
+  - {fileID: -7865935005386343725}
+  - {fileID: -7294717224834982736}
+  - {fileID: 3664411454258489227}
+  - {fileID: -8483001260991839848}
+  - {fileID: 2875811880884880659}
+  - {fileID: 335750822369218430}
+  - {fileID: 571002414013589554}
+  - {fileID: 3708004029589518685}
+  - {fileID: -4173245328923776037}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -574983459096196582}
+  - {fileID: -2621528163172788261}
   StringsBanks:
-  - {fileID: 1731552180590735176}
+  - {fileID: 6122914274757880781}
   cacheVersion: 131861
-  cacheTime: 639292396981293030
+  cacheTime: 639295091412253234
   SerializableEventsDict:
-  - key: event:/Burning Windmill
+  - key: event:/SFX/efecto de espada
     index: 0
-  - key: event:/Dripping Well
+  - key: event:/Ambience/Burning Windmill SFX
     index: 1
-  - key: event:/Town Wind Loop
+  - key: event:/Ambience/Dripping Well SFX
     index: 2
-  - key: event:/Burning House
+  - key: event:/SFX/SFX_Fuego
     index: 3
-  - key: event:/Windmill
+  - key: event:/SFX/efecto de puerta
     index: 4
-  - key: event:/Wind Bells
+  - key: event:/SFX/SFX_Fogata
     index: 5
-  - key: event:/Forest Night Loop
+  - key: event:/Ambience/Town Wind Loop Ambience
     index: 6
+  - key: event:/SFX/Sonido para los enemigos
+    index: 7
+  - key: event:/Ambience/Burning House SFX
+    index: 8
+  - key: event:/Ambience/Windmill SFX
+    index: 9
+  - key: event:/Ambience/Wind Bells SFX
+    index: 10
+  - key: event:/SFX/armadura impacto
+    index: 11
+  - key: event:/SFX/Dolor
+    index: 12
+  - key: event:/Music/Event_Juego
+    index: 13
+  - key: event:/Ambience/Forest Night Loop Ambience
+    index: 14
+  - key: event:/SFX/monedas
+    index: 15
+--- !u!114 &59942751972072482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: ../../Crown-of-Heresy-Fmod-Project/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 639292396981271974
+  FileSizes:
+  - Name: Desktop
+    Value: 2537408
+  Exists: 1
+--- !u!114 &335750822369218430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Dolor
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/Dolor
+  Guid:
+    Data1: 1044934040
+    Data2: 1234485724
+    Data3: 1510984361
+    Data4: -1291846075
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 2000
+--- !u!114 &571002414013589554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music/Event_Juego
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Music/Event_Juego
+  Guid:
+    Data1: 1212636080
+    Data2: 1321727567
+    Data3: -307457382
+    Data4: 508538273
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -8783515594212397321}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 29000
 --- !u!114 &755179696404241786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +856,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 81264
+--- !u!114 &756456858929091261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Dripping Well SFX
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Dripping Well SFX
+  Guid:
+    Data1: -519689457
+    Data2: 1336299858
+    Data3: 1415556528
+    Data4: -535934022
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 4224
 --- !u!114 &1411853284319631805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,6 +984,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 4224
+--- !u!114 &2875811880884880659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/armadura impacto
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/armadura impacto
+  Guid:
+    Data1: 1652924023
+    Data2: 1227878547
+    Data3: -1744699518
+    Data4: -1397012152
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &3091167423102367180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,6 +1038,87 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 9983
+--- !u!114 &3664411454258489227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Windmill SFX
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Windmill SFX
+  Guid:
+    Data1: -1021119898
+    Data2: 1274035519
+    Data3: 509579411
+    Data4: -1265500564
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 81264
+--- !u!114 &3708004029589518685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Forest Night Loop Ambience
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Forest Night Loop Ambience
+  Guid:
+    Data1: 1650496195
+    Data2: 1204808610
+    Data3: -964281984
+    Data4: 750626957
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 27167
+--- !u!114 &3862577845575857961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/SFX_Fuego
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/SFX_Fuego
+  Guid:
+    Data1: -523312611
+    Data2: 1165588212
+    Data3: 1997941917
+    Data4: -711616461
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &4290638518959603250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,6 +1173,26 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 27167
+--- !u!114 &4313734621307751610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: ../../Crown-of-Heresy-Fmod-Project/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 639292396981293030
+  FileSizes:
+  - Name: Desktop
+    Value: 1062
+  Exists: 1
 --- !u!114 &4432291219016141023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -624,6 +1220,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 9983
+--- !u!114 &4708610604748805721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/efecto de puerta
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/efecto de puerta
+  Guid:
+    Data1: -1044885470
+    Data2: 1246016403
+    Data3: -808728652
+    Data4: -188440485
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 1000
 --- !u!114 &5705722436382539708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -644,6 +1267,134 @@ MonoBehaviour:
     Data4: 1691498667
   Banks:
   - {fileID: -574983459096196582}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 11520
+--- !u!114 &6122914274757880781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: Assets/StreamingAssets/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 639295091412253234
+  FileSizes:
+  - Name: 
+    Value: 1610
+  Exists: 1
+--- !u!114 &6437191369899242765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Town Wind Loop Ambience
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Town Wind Loop Ambience
+  Guid:
+    Data1: -355782615
+    Data2: 1220206261
+    Data3: 1172039865
+    Data4: 1263030538
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 110064
+--- !u!114 &7270803061898760737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/efecto de espada
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/efecto de espada
+  Guid:
+    Data1: -1691449589
+    Data2: 1173268200
+    Data3: 109964964
+    Data4: -1386155875
+  Banks:
+  - {fileID: -2621528163172788261}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 8.400001
+  Length: 0
+--- !u!114 &7926981285801197577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Forest Night Loop
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Forest Night Loop
+  Guid:
+    Data1: 1650496195
+    Data2: 1204808610
+    Data3: -964281984
+    Data4: 750626957
+  Banks:
+  - {fileID: 59942751972072482}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 27167
+--- !u!114 &7941611297045382631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Wind Bells
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Wind Bells
+  Guid:
+    Data1: -35949198
+    Data2: 1074160067
+    Data3: 2093676948
+    Data4: 1691498667
+  Banks:
+  - {fileID: 59942751972072482}
   IsStream: 1
   Is3D: 1
   IsOneShot: 0

@@ -1501,7 +1501,7 @@ MonoBehaviour:
       Data2: 1185550089
       Data3: 1246601873
       Data4: 1556746533
-    Path: event:/Burning Windmill
+    Path: event:/Ambience/Burning Windmill SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -1512,7 +1512,7 @@ MonoBehaviour:
   Params: []
   OverrideAttenuation: 1
   OverrideMinDistance: 1
-  OverrideMaxDistance: 10
+  OverrideMaxDistance: 20
 --- !u!4 &151612515
 Transform:
   m_ObjectHideFlags: 0
@@ -20902,7 +20902,7 @@ MonoBehaviour:
       Data2: 1263093885
       Data3: 798577060
       Data4: 1110085315
-    Path: event:/Burning House
+    Path: event:/Ambience/Burning House SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -21444,19 +21444,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.5946488
+      value: -0.5673131
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.030454472
+      value: -0.029054487
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.802357
+      value: -0.82191235
       objectReference: {fileID: 0}
     - target: {fileID: 607891903137593821, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.041092087
+      value: 0.04209359
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalPosition.x
@@ -21472,19 +21472,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.59464884
+      value: -0.5673131
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.030454466
+      value: -0.029054487
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.8023571
+      value: -0.82191235
       objectReference: {fileID: 0}
     - target: {fileID: 2484515152898334049, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.04109208
+      value: 0.04209359
       objectReference: {fileID: 0}
     - target: {fileID: 2597002262844181907, guid: 78a78c4cda512cb40845e75831e73068, type: 3}
       propertyPath: near clip plane
@@ -28329,7 +28329,7 @@ Transform:
   m_GameObject: {fileID: 981553493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.44662, y: 16.1, z: 83.9}
+  m_LocalPosition: {x: -10.44662, y: 16.1, z: 81.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -30797,7 +30797,7 @@ MonoBehaviour:
       Data2: 1336299858
       Data3: 1415556528
       Data4: -535934022
-    Path: event:/Dripping Well
+    Path: event:/Ambience/Dripping Well SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -35749,7 +35749,7 @@ Transform:
   m_GameObject: {fileID: 1679095809}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.44662, y: 16.1, z: 7.7}
+  m_LocalPosition: {x: -10.44662, y: 16.1, z: 5.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38838,14 +38838,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioEventEmitter
-  CollisionTag: 
+  CollisionTag: Player
   EventReference:
     Guid:
       Data1: -1021119898
       Data2: 1274035519
       Data3: 509579411
       Data4: -1265500564
-    Path: event:/Windmill
+    Path: event:/Ambience/Windmill SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -38854,7 +38854,7 @@ MonoBehaviour:
   Preload: 0
   NonRigidbodyVelocity: 0
   Params: []
-  OverrideAttenuation: 0
+  OverrideAttenuation: 1
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
 --- !u!4 &2065040801
@@ -39039,7 +39039,7 @@ MonoBehaviour:
       Data2: 1074160067
       Data3: 2093676948
       Data4: 1691498667
-    Path: event:/Wind Bells
+    Path: event:/Ambience/Wind Bells SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -39048,7 +39048,7 @@ MonoBehaviour:
   Preload: 0
   NonRigidbodyVelocity: 0
   Params: []
-  OverrideAttenuation: 0
+  OverrideAttenuation: 1
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
 --- !u!4 &2080824342
