@@ -594,6 +594,7 @@ public static class PlayerKnightSetup
             WeaponHitbox hitbox = SetupSword(knight, rightHand, player.layer);
             AttachLoosePropsToBones(knight, animator.avatar);
             Transform hipSocket = CreateHipSocket(knight, animator.avatar, player.transform, height);
+            ApplySwordPose(knight, hipSocket);
             SetLayerRecursively(knight, player.layer);
 
             GameObject cameraTarget = new GameObject(CameraTargetName);
@@ -805,6 +806,34 @@ public static class PlayerKnightSetup
         return hitboxObject.AddComponent<WeaponHitbox>();
     }
 
+    // Cómo sostiene la espada y dónde la cuelga guardada: los valores que ajustó Lautaro a mano
+    // mirando las animaciones (con la espada como viene en el modelo, el caballero la sostenía en un
+    // ángulo raro). Son locales al padre de cada uno:
+    //   - "sword" (hija de SwordGrip): girada unos 180° y corrida para que la empuñadura quede en el puño.
+    //   - SwordHipSocket (hijo de Hips): la espada guardada, movida y girada.
+    // Las armas con modelo propio se sostienen igual, porque el soporte WeaponHolder copia el giro de
+    // "sword" (PlayerWeaponSheath). Están también en el prefab: esto los repone al rearmar el caballero.
+    private static readonly Vector3 SwordLocalPosition = new Vector3(-0.001f, 0.0016855755f, -0.00044641024f);
+    private static readonly Quaternion SwordLocalRotation = new Quaternion(0.2815981f, 0.65445817f, -0.29799765f, -0.635283f);
+    private static readonly Vector3 HipSocketLocalPosition = new Vector3(-0.00229f, 0.00329f, 0.00247f);
+    private static readonly Quaternion HipSocketLocalRotation = new Quaternion(0.31920245f, -0.4442345f, -0.54925567f, -0.63173074f);
+
+    private static void ApplySwordPose(GameObject knight, Transform hipSocket)
+    {
+        Transform grip = FindDeep(knight.transform, SwordGripName);
+        Renderer sword = grip != null ? grip.GetComponentInChildren<Renderer>(true) : null;
+        if (sword != null && sword.transform.parent == grip)
+        {
+            sword.transform.localPosition = SwordLocalPosition;
+            sword.transform.localRotation = SwordLocalRotation;
+        }
+        if (hipSocket != null)
+        {
+            hipSocket.localPosition = HipSocketLocalPosition;
+            hipSocket.localRotation = HipSocketLocalRotation;
+        }
+    }
+
     // Objetos rígidos sueltos del modelo (por ejemplo las rosas del pecho): como no están pegados
     // a ningún hueso, se quedarían flotando cuando el cuerpo se mueve. Se cuelgan del hueso más
     // cercano para que sigan la animación.
@@ -840,7 +869,7 @@ public static class PlayerKnightSetup
     // Punto en la cadera izquierda donde cuelga la espada guardada (SwordHipSocket, hijo del hueso
     // Hips). Se orienta para que la empuñadura quede a la altura de la cadera y la hoja apunte
     // hacia abajo y un poco hacia atrás, con el lado plano mirando hacia afuera.
-    // Para acomodarla distinto, mover/rotar SwordHipSocket en el prefab.
+    // Después ApplySwordPose la pone donde la ajustó Lautaro (para acomodarla distinto, cambiar esos números).
     private static Transform CreateHipSocket(GameObject knight, Avatar avatar, Transform player, float height)
     {
         Transform hips = FindHumanBone(knight, avatar, "Hips");

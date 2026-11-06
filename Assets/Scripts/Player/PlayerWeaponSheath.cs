@@ -14,6 +14,8 @@ using UnityEngine;
 // "WeaponHolder", que se crea al arrancar con la espada del personaje adentro. El arma equipada
 // puede cambiar el modelo que va en el soporte (SetWeaponModel, lo llama PlayerCombat).
 // Para acomodar cómo queda en la cintura, se mueve/rota SwordHipSocket.
+// Mientras ataca, el soporte se gira un poco sobre la empuñadura hacia la línea del antebrazo
+// (LateUpdate): el golpe se estira y llega más lejos, en vez de quedarse corto.
 //
 // Las animaciones de desenvainar/envainar van en la capa "UpperBody" del Animator (solo torso,
 // brazos y cabeza), así el personaje puede seguir caminando mientras desenvaina.
@@ -53,6 +55,19 @@ public class PlayerWeaponSheath : MonoBehaviour
     [Tooltip("En qué parte de la animación la espada pasa de la mano a la cintura (0 = al principio, 1 = al final).")]
     [Range(0f, 1f)] [SerializeField] private float sheatheHideAt = 0.65f;
 
+    [Header("Giro al atacar")]
+    [Tooltip("Mientras ataca, la hoja se acerca a la línea del antebrazo (del codo a la muñeca), girando sobre la " +
+             "empuñadura: el golpe se estira y llega más lejos. 0 = no gira.")]
+    [Range(0f, 1f)] [SerializeField] private float attackTilt = 1f;
+    [Tooltip("Grados entre la hoja y la línea del antebrazo hasta donde la lleva: más bajo = más estirada.")]
+    [SerializeField] private float attackTiltTargetAngle = 20f;
+    [Tooltip("Lo más que gira la espada al atacar, en grados.")]
+    [SerializeField] private float attackTiltMaxAngle = 45f;
+    [Tooltip("Segundos que tarda en girar al empezar el ataque y en volver al terminar.")]
+    [SerializeField] private float attackTiltBlendTime = 0.08f;
+    [Tooltip("Escribe en la consola, por ataque, cuánto se separaba la hoja del antebrazo y cuánto se giró.")]
+    [SerializeField] private bool logAttackTilt = true;
+
     [Header("Debug")]
     [SerializeField] private bool debugLogs;
 
@@ -70,6 +85,12 @@ public class PlayerWeaponSheath : MonoBehaviour
     private bool isDrawing;
     private float lastCombatTime;
     private int upperBodyLayer = -1;
+    private Transform lowerArm;            // codo y muñeca derechos (huesos del avatar), para el giro al atacar
+    private Transform wrist;
+    private float tiltWeight;              // 0..attackTilt: sube al atacar y baja al terminar
+    private bool wasAttacking;
+    private float tiltMaxAngle;            // para el log: lo más lejos que estuvo la hoja del antebrazo en el ataque
+    private float tiltMaxTurn;             // y lo más que se giró
 
     public bool IsDrawn { get; private set; }
     public bool IsBusy => routine != null; // desenvainando o envainando
@@ -103,6 +124,61 @@ public class PlayerWeaponSheath : MonoBehaviour
 
         if (animator != null)
             upperBodyLayer = animator.GetLayerIndex(UpperBodyLayer);
+        if (animator != null && animator.isHuman)
+        {
+            lowerArm = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
+            wrist = animator.GetBoneTransform(HumanBodyBones.RightHand);
+        }
+    }
+
+    // Giro al atacar. Va después de la animación: el soporte vuelve a su lugar en la mano y, si está
+    // atacando, se gira sobre la empuñadura hacia la línea del antebrazo (sin pasarse de
+    // attackTiltTargetAngle ni girar más de attackTiltMaxAngle). Como se recalcula cada frame desde
+    // handLocalRotation, no se acumula. El hitbox va adentro del soporte, así que el golpe también
+    // llega más lejos.
+    private void LateUpdate()
+    {
+        // En la cintura (o al rodar, que la guarda al instante) no gira
+        if (holder == null || handGrip == null || holder.parent != handGrip)
+        {
+            tiltWeight = 0f;
+            wasAttacking = false;
+            tiltMaxAngle = 0f;
+            tiltMaxTurn = 0f;
+            return;
+        }
+
+        bool attacking = controller != null && controller.CurrentState == PlayerState.Attacking;
+        float step = attackTiltBlendTime > 0f ? Time.deltaTime / attackTiltBlendTime : 1f;
+        tiltWeight = Mathf.MoveTowards(tiltWeight, attacking ? attackTilt : 0f, step);
+
+        holder.localRotation = handLocalRotation;
+        if (tiltWeight > 0f && lowerArm != null && wrist != null)
+        {
+            Vector3 blade = holder.up; // +Y del soporte = hacia la punta
+            Vector3 forearm = wrist.position - lowerArm.position;
+            float angle = Vector3.Angle(blade, forearm);
+            float turn = Mathf.Min(Mathf.Max(0f, angle - attackTiltTargetAngle), attackTiltMaxAngle) * tiltWeight;
+            Vector3 axis = Vector3.Cross(blade, forearm);
+            if (turn > 0.01f && axis.sqrMagnitude > 1e-8f)
+                holder.rotation = Quaternion.AngleAxis(turn, axis.normalized) * holder.rotation;
+
+            if (attacking)
+            {
+                tiltMaxAngle = Mathf.Max(tiltMaxAngle, angle);
+                tiltMaxTurn = Mathf.Max(tiltMaxTurn, turn);
+            }
+        }
+
+        if (wasAttacking && !attacking)
+        {
+            if (logAttackTilt)
+                Debug.Log($"[PlayerWeaponSheath] Giro al atacar: la hoja llegó a estar a {tiltMaxAngle:F0}° de la línea " +
+                          $"del antebrazo y se giró hasta {tiltMaxTurn:F0}°.", this);
+            tiltMaxAngle = 0f;
+            tiltMaxTurn = 0f;
+        }
+        wasAttacking = attacking;
     }
 
     private void Start()
