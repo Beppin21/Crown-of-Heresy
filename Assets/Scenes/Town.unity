@@ -1533,7 +1533,7 @@ MonoBehaviour:
       Data2: 1185550089
       Data3: 1246601873
       Data4: 1556746533
-    Path: event:/Burning Windmill
+    Path: event:/Ambience/Burning Windmill SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -1544,7 +1544,7 @@ MonoBehaviour:
   Params: []
   OverrideAttenuation: 1
   OverrideMinDistance: 1
-  OverrideMaxDistance: 10
+  OverrideMaxDistance: 20
 --- !u!4 &151612515
 Transform:
   m_ObjectHideFlags: 0
@@ -21618,7 +21618,7 @@ MonoBehaviour:
       Data2: 1263093885
       Data3: 798577060
       Data4: 1110085315
-    Path: event:/Burning House
+    Path: event:/Ambience/Burning House SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -29231,7 +29231,7 @@ Transform:
   m_GameObject: {fileID: 981553493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.44662, y: 16.1, z: 83.9}
+  m_LocalPosition: {x: -10.44662, y: 16.1, z: 81.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -31911,7 +31911,7 @@ MonoBehaviour:
       Data2: 1336299858
       Data3: 1415556528
       Data4: -535934022
-    Path: event:/Dripping Well
+    Path: event:/Ambience/Dripping Well SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -37275,7 +37275,7 @@ Transform:
   m_GameObject: {fileID: 1679095809}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.44662, y: 16.1, z: 7.7}
+  m_LocalPosition: {x: -10.44662, y: 16.1, z: 5.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40501,14 +40501,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioEventEmitter
-  CollisionTag: 
+  CollisionTag: Player
   EventReference:
     Guid:
       Data1: -1021119898
       Data2: 1274035519
       Data3: 509579411
       Data4: -1265500564
-    Path: event:/Windmill
+    Path: event:/Ambience/Windmill SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -40517,7 +40517,7 @@ MonoBehaviour:
   Preload: 0
   NonRigidbodyVelocity: 0
   Params: []
-  OverrideAttenuation: 0
+  OverrideAttenuation: 1
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
 --- !u!4 &2065040801
@@ -40702,7 +40702,7 @@ MonoBehaviour:
       Data2: 1074160067
       Data3: 2093676948
       Data4: 1691498667
-    Path: event:/Wind Bells
+    Path: event:/Ambience/Wind Bells SFX
   Event: 
   EventPlayTrigger: 1
   EventStopTrigger: 0
@@ -40711,7 +40711,7 @@ MonoBehaviour:
   Preload: 0
   NonRigidbodyVelocity: 0
   Params: []
-  OverrideAttenuation: 0
+  OverrideAttenuation: 1
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
 --- !u!4 &2080824342
